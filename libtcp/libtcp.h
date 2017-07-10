@@ -1,0 +1,57 @@
+/* TCP client-side DNS structures.
+ * 
+ * --WORK IN PROGRESS--
+ *
+ * Copyright (C) 2017 Dimitrios Gravanis
+ * 
+ * Based on the existing Samba Unix SMB/CIFS implementation.
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#ifndef __LIBTCP_H__
+#define __LIBTCP_H__
+
+#include "source4/dns_server/dns_server.h"
+#include "source4/dns_server/dnsserver_common.h"
+#include "lib/tsocket/tsocket.h"
+
+/** dns tcp definitions **/
+struct tsocket_address;
+
+struct dns_socket {
+	struct dns_server *dns;
+	struct tsocket_address *local_address;	
+};
+
+struct dns_tcp_request_state {
+	struct tevent_context *ev;
+	struct tstream_context *tstream;
+	size_t query_len;
+	uint32_t *reply;
+	size_t reply_len;
+};
+
+/* dns tcp request */
+struct tevent_req *tstream_writev_send(TALLOC_CTX *mem_ctx,
+				       struct tevent_context *ev,
+				       struct tstream_context *stream,
+				       const struct iovec *vector,
+				       size_t count);
+
+/* dns tcp response result */
+int tstream_writev_recv(struct tevent_req *req,
+			    int *perrno);
+
+#endif /*__LIBTCP_H__*/

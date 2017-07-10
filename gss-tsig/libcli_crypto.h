@@ -1,0 +1,99 @@
+/* GSS-TSIG client-side DNS structures.
+ * 
+ * --WORK IN PROGRESS--
+ *
+ * Copyright (C) 2017 Dimitrios Gravanis
+ * 
+ * Based on the existing Samba Unix SMB/CIFS implementation.
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#ifndef __DNS_CLIENT_H__
+#define __DNS_CLIENT_H__
+
+#include "librpc/gen_ndr/dns.h"
+#include "librpc/gen_ndr/ndr_dnsp.h"
+
+/* error handling */
+uint8_t werr_to_dns_err(WERROR werr);
+#define DNS_ERR(err_str) WERR_DNS_ERROR_RCODE_##err_str
+
+struct dns_client_zone {
+	struct dns_client_zone *prev, *next;
+	const char *name;
+	struct ldb_dn *dn;
+};
+
+/* structures */
+struct dns_client {
+	struct task_server *task;
+	struct ldb_context *samdb;
+	struct dns_client_zone *zones;
+	struct dns_client_tkey_store *tkeys;
+	struct cli_credentials *server_credentials;
+	uint16_t max_payload;
+};
+
+struct dns_request_state {
+	TALLOC_CTX *mem_ctx;
+	uint16_t flags;
+	bool authenticated;
+	bool sign;
+	char *key_name;
+	struct dns_res_rec *tsig;
+	uint16_t tsig_error;
+};
+
+/* transaction key */
+#define TKEY_BUFFER_SIZE 128
+
+struct dns_client_tkey {
+	const char *name;
+	enum dns_tkey_mode mode;
+	const char *algorithm;
+	struct auth_session_info *session_info;
+	struct gensec_security *gensec;
+	bool complete;
+};
+
+struct dns_client_tkey_store {
+	struct dns_client_tkey **tkeys;
+	uint16_t next_idx;
+	uint16_t size;
+};
+
+/* tsig validation */
+WERROR dns_validate_tsig(struct dns_client *dns,
+		       TALLOC_CTX *mem_ctx,
+		       struct dns_request_state *state,
+		       struct dns_name_packet *packet,
+		       DATA_BLOB *in);
+
+/* sign tsig */
+WERROR dns_cli_sign_tsig(struct dns_client *dns,
+		     TALLOC_CTX *mem_ctx,
+		     struct dns_request_state *state,
+		     struct dns_name_packet *packet,
+		     uint16_t error)
+
+/* mac computation */
+WERROR dns_tsig_cli_add_mac(TALLOC_CTX *mem_ctx,
+				   struct dns_request_state *state,
+				   struct dns_name_packet *packet,
+				   struct dns_client_tkey *tkey,
+				   time_t current_time,
+				   DATA_BLOB *_psig)
+
+#endif /* __DNS_CLIENT_H__ */
