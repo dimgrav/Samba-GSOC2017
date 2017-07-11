@@ -1,4 +1,4 @@
-/* GSS-TSIG client-side DNS structures.
+/* GSS-TSIG client-side DNS structures and utilites.
  * 
  * --WORK IN PROGRESS--
  *
@@ -30,13 +30,13 @@
 uint8_t werr_to_dns_err(WERROR werr);
 #define DNS_ERR(err_str) WERR_DNS_ERROR_RCODE_##err_str
 
+/* client structures */
 struct dns_client_zone {
 	struct dns_client_zone *prev, *next;
 	const char *name;
 	struct ldb_dn *dn;
 };
 
-/* structures */
 struct dns_client {
 	struct task_server *task;
 	struct ldb_context *samdb;
@@ -74,26 +74,11 @@ struct dns_client_tkey_store {
 	uint16_t size;
 };
 
-/* tsig validation */
-WERROR dns_validate_tsig(struct dns_client *dns,
+/* tsig bytes removal */
+WERROR dns_cli_generate_sig(struct dns_client *dns,
 		       TALLOC_CTX *mem_ctx,
-		       struct dns_request_state *state,
 		       struct dns_name_packet *packet,
+		       struct dns_request_state *state,
 		       DATA_BLOB *in);
-
-/* sign tsig */
-WERROR dns_cli_sign_tsig(struct dns_client *dns,
-		     TALLOC_CTX *mem_ctx,
-		     struct dns_request_state *state,
-		     struct dns_name_packet *packet,
-		     uint16_t error)
-
-/* mac computation */
-WERROR dns_tsig_cli_add_mac(TALLOC_CTX *mem_ctx,
-				   struct dns_request_state *state,
-				   struct dns_name_packet *packet,
-				   struct dns_client_tkey *tkey,
-				   time_t current_time,
-				   DATA_BLOB *_psig)
 
 #endif /* __DNS_CLIENT_H__ */
