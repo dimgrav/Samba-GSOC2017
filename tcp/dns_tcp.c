@@ -4,7 +4,8 @@
  *
  * Copyright (C) 2017 Dimitrios Gravanis
  * 
- * Based on the existing Samba Unix SMB/CIFS implementation.
+ * Based on the existing work on Samba Unix SMB/CIFS implementation by
+ * Kai Blin Copyright (C) 2011, Stefan Metzmacher Copyright (C) 2014
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
