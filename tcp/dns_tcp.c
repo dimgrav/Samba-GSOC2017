@@ -37,17 +37,17 @@
 static void dns_tcp_req_recv_reply(struct tevent_req *subreq);
 static void dns_tcp_req_done(struct tevent_req *subreq);
 
-/* tcp request send */
-struct tevent_req *tstream_writev_send(TALLOC_CTX *mem_ctx,
+/* tcp request to send */
+struct tevent_req *dns_tcp_req_send(TALLOC_CTX *mem_ctx,
 					struct tevent_context *ev,
-					struct tstream_context *tstream,
-					const struct iovec *vector,
-					size_t count);
+					const char *server_addr_string,
+					struct iovec *vector,
+					size_t count)
 {
 	struct tevent_req *req, *subreq;
 	struct dns_tcp_request_state *state;
 	struct tsocket_address *local_addr, *server_addr;
-	struct tstream_context *tstream;
+	struct tstream_context *stream;
 	int ret;
 
 	req = tevent_req_create(mem_ctx, &state, struct dns_tcp_request_state);
@@ -57,7 +57,7 @@ struct tevent_req *tstream_writev_send(TALLOC_CTX *mem_ctx,
 
 	state->ev = ev;
 
-	/* check for connected sockets and use */
+	/* check for connected sockets and use if any */
 	ret = tsocket_address_inet_from_strings(state, "ip", NULL, 0,
 						&local_addr);
 	if (ret != 0) {
@@ -78,12 +78,12 @@ struct tevent_req *tstream_writev_send(TALLOC_CTX *mem_ctx,
 		return tevent_req_post(req, ev);
 	}
 
-	state->tstream = tstream;
-	state->query_len = query_len;
+	state->tstream = stream;
+	state->query_len = count;
 
-	dump_data(10, query, query_len);
+	dump_data(10, *vector, count); // not sure how dump data works
 
-	subreq = tstream_writev_send(mem_ctx, ev, tstream, vector, count, NULL);
+	subreq = tstream_writev_send(mem_ctx, ev, stream, *vector, count);
 	if (tevent_req_nomem(subreq, req)) {
 		return tevent_req_post(req, ev);
 	}
@@ -94,11 +94,13 @@ struct tevent_req *tstream_writev_send(TALLOC_CTX *mem_ctx,
 		return tevent_req_post(req, ev);
 	}
 
+	/* associate callback */
 	tevent_req_set_callback(subreq, dns_tcp_req_recv_reply, req);
+	
 	return req;
 }
 
-/* receive server response */
+/* wait to receive server response */
 static void dns_tcp_req_recv_reply(struct tevent_req *subreq)
 {
 	struct tevent_req *req = tevent_req_callback_data(subreq,
@@ -108,7 +110,7 @@ static void dns_tcp_req_recv_reply(struct tevent_req *subreq)
 	ssize_t len;
 	int err = 0;
 
-	len = tstream_read_pdu_blob_recv(subreq, &err);
+	len = tstream_readv_pdu_recv(subreq, &err);
 	TALLOC_FREE(subreq);
 
 	if (len == -1 && err != 0) {
@@ -121,11 +123,13 @@ static void dns_tcp_req_recv_reply(struct tevent_req *subreq)
 		return;
 	}
 
-	subreq = tstream_read_pdu_blob_send(state, state->ev, state->tstream);
+	// need help here on how to pass the vector
+	subreq = tstream_readv_pdu_send(*mem_ctx, state->ev, state->stream, , );
 	if (tevent_req_nomem(subreq, req)) {
 		return;
 	}
 
+	/* associate callback */
 	tevent_req_set_callback(subreq, dns_tcp_req_done, req);
 }
 
@@ -140,7 +144,7 @@ static void dns_tcp_req_done(struct tevent_req *subreq)
 	ssize_t len;
 	int err = 0;
 
-	len = tstream_read_pdu_blob_recv(subreq, &err, state, &state->reply, NULL);
+	len = tstream_readv_pdu_recv(subreq, &err);
 	TALLOC_FREE(subreq);
 
 	if (len == -1 && err != 0) {
@@ -153,9 +157,11 @@ static void dns_tcp_req_done(struct tevent_req *subreq)
 	tevent_req_done(req);
 }
 
-/*  receive result */
-int tstream_writev_recv(struct tevent_req *req,
-			 int *perrno)
+/*  receiver */
+int dns_tcp_req_recv(struct tevent_req *req,
+			 		TALLOC_CTX *mem_ctx,
+			 		uint8_t **reply,
+			 		size_t *reply_len)
 {
 	struct dns_tcp_request_state *state = tevent_req_data(req,
 			struct dns_tcp_request_state);

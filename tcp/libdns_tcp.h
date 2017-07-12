@@ -37,21 +37,23 @@ struct dns_socket {
 
 struct dns_tcp_request_state {
 	struct tevent_context *ev;
-	struct tstream_context *tstream;
+	struct tstream_context *stream;
 	size_t query_len;
 	uint32_t *reply;
 	size_t reply_len;
 };
 
-/* dns tcp request */
-struct tevent_req *tstream_writev_send(TALLOC_CTX *mem_ctx,
-				       struct tevent_context *ev,
-				       struct tstream_context *stream,
-				       const struct iovec *vector,
-				       size_t count);
+/* dns tcp request buffer */
+struct tevent_req *dns_tcp_req_send(TALLOC_CTX *mem_ctx,
+					struct tevent_context *ev,
+					const char *server_addr_string,
+					struct iovec *vector,
+					size_t count);
 
-/* dns tcp response result */
-int tstream_writev_recv(struct tevent_req *req,
-			    int *perrno);
+/* dns tcp response */
+int dns_tcp_req_recv(struct tevent_req *req,
+			 TALLOC_CTX *mem_ctx,
+			 uint8_t **reply,
+			 size_t *reply_len);
 
 #endif /*__LIBTCP_H__*/
