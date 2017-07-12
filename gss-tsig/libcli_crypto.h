@@ -75,8 +75,13 @@ struct dns_client_tkey_store {
 	uint16_t size;
 };
 
+/* make empty tsig rdata packet copy */
+static WERROR dns_empty_tsig(TALLOC_CTX *mem_ctx,
+					struct dns_res_rec *orig_record,
+					struct dns_res_rec *empty_record)
+
 /* generate signed packet */
-WERROR dns_cli_generate_sig(struct dns_client *dns,
+static WERROR dns_cli_generate_sig(struct dns_client *dns,
 		       TALLOC_CTX *mem_ctx,
 		       struct dns_name_packet *packet,
 		       struct dns_request_state *state,

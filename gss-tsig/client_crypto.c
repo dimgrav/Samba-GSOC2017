@@ -85,7 +85,7 @@ struct dns_client_tkey *dns_find_tkey(struct dns_client_tkey_store *store,
 }
 
 /* generate signature */
-WERROR dns_cli_generate_sig(struct dns_client *dns,
+static WERROR dns_cli_generate_sig(struct dns_client *dns,
 		       				TALLOC_CTX *mem_ctx,
 		       				struct dns_request_state *state,
 		        			struct dns_name_packet *packet,
@@ -99,7 +99,7 @@ WERROR dns_cli_generate_sig(struct dns_client *dns,
 	struct dns_client_tkey *tkey = NULL;
 	struct dns_fake_tsig_rec *check_rec = talloc_zero(mem_ctx, struct dns_fake_tsig_rec);
 
-	/* save the keyname from the TSIG request*/
+	/* save the keyname from the TSIG request to add MAC later*/
 	tkey = dns_find_tkey(dns->tkeys, state->tsig->name);
 	if (tkey == NULL) {
 		state->key_name = talloc_strdup(state->mem_ctx,
