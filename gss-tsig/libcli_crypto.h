@@ -75,6 +75,10 @@ struct dns_client_tkey_store {
 	uint16_t size;
 };
 
+/* identify tkey in record */
+struct dns_client_tkey *dns_find_tkey(struct dns_client_tkey_store *store,
+				      const char *name)
+
 /* make empty tsig rdata packet copy */
 static WERROR dns_empty_tsig(TALLOC_CTX *mem_ctx,
 					struct dns_res_rec *orig_record,
