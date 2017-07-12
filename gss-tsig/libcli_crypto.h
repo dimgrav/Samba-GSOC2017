@@ -75,7 +75,7 @@ struct dns_client_tkey_store {
 	uint16_t size;
 };
 
-/* tsig bytes removal */
+/* generate signed packet */
 WERROR dns_cli_generate_sig(struct dns_client *dns,
 		       TALLOC_CTX *mem_ctx,
 		       struct dns_name_packet *packet,

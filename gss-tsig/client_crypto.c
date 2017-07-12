@@ -31,8 +31,8 @@
 #include "auth/gensec/gensec.h"
 #include "libcli_crypto.h"
 
-/* make a copy of the original tsig record */
-/* with null rdata values */
+/* make a copy of the original tsig record
+* with null rdata values (for future test purposes)*/
 static WERROR dns_empty_tsig(TALLOC_CTX *mem_ctx,
 					struct dns_res_rec *orig_record,
 					struct dns_res_rec *empty_record)
@@ -91,9 +91,10 @@ WERROR dns_cli_generate_sig(struct dns_client *dns,
 		        			struct dns_name_packet *packet,
 		        			DATA_BLOB *in)
 {
+	NTSTATUS gen_sig;
 	uint16_t i, arcount = 0;
 	DATA_BLOB tsig_blob, fake_tsig_blob, sig;
-	uint8_t *buffer = NULL; //sig_buff?
+	uint8_t *buffer = NULL;
 	size_t buffer_len = 0, packet_len = 0;
 	struct dns_client_tkey *tkey = NULL;
 	struct dns_fake_tsig_rec *check_rec = talloc_zero(mem_ctx, struct dns_fake_tsig_rec);
@@ -129,8 +130,8 @@ WERROR dns_cli_generate_sig(struct dns_client *dns,
 	memcpy(buffer, in->data, packet_len);
 	memcpy(buffer + packet_len, fake_tsig_blob.data, fake_tsig_blob.length);
 
-	/* what type does gensec_sign_packet() return? */
-	sig_buff = gensec_sign_packet(tkey->gensec, mem_ctx, buffer, buffer_len,
+	/* generate signature */
+	gen_sig = gensec_sign_packet(tkey->gensec, mem_ctx, buffer, buffer_len,
 				    buffer, buffer_len, &sig);
 
 	/* get MAC size and save MAC to sig*/
