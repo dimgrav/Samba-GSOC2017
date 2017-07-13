@@ -44,6 +44,13 @@ struct dns_tcp_request_state {
 	size_t reply_len;
 };
 
+struct dns_tcp_connection {
+	struct stream_connection *conn;
+	struct dns_socket *dns_socket;
+	struct tstream_context *tstream;
+	struct tevent_queue *send_queue;
+};
+
 /* dns tcp request buffer */
 struct tevent_req *dns_tcp_req_send(TALLOC_CTX *mem_ctx,
 					struct tevent_context *ev,
