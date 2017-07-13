@@ -82,7 +82,7 @@ struct tevent_req *dns_tcp_req_send(TALLOC_CTX *mem_ctx,
 	state->tstream = stream;
 	state->query_len = count;
 
-	dump_data(10, *vector, count); // not sure how dump data works
+	dump_data(10, *vector, count); // not sure how dump data works with pointers
 
 	subreq = tstream_writev_send(mem_ctx, ev, stream, *vector, count);
 	if (tevent_req_nomem(subreq, req)) {
@@ -111,7 +111,7 @@ static void dns_tcp_req_recv_reply(struct tevent_req *subreq)
 	ssize_t len;
 	int err = 0;
 
-	len = tstream_readv_pdu_recv(subreq, &err);
+	len = tstream_writev_recv(subreq, &err);
 	TALLOC_FREE(subreq);
 
 	if (len == -1 && err != 0) {
@@ -125,7 +125,7 @@ static void dns_tcp_req_recv_reply(struct tevent_req *subreq)
 	}
 
 	// need help here on how to pass the vector
-	subreq = tstream_readv_pdu_send(*mem_ctx, state->ev, state->stream, , );
+	subreq = tstream_readv_pdu_send(state, state->ev, state->stream, , );
 	if (tevent_req_nomem(subreq, req)) {
 		return;
 	}
