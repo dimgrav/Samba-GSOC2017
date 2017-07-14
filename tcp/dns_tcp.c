@@ -82,7 +82,7 @@ struct tevent_req *dns_tcp_req_send(TALLOC_CTX *mem_ctx,
 	state->tstream = stream;
 	state->query_len = count;
 
-	dump_data(10, *vector, count); // not sure how dump data works with pointers
+	// dump_data(10, *vector, count); not sure how dump data works with pointers
 
 	subreq = tstream_writev_send(mem_ctx, ev, stream, *vector, count);
 	if (tevent_req_nomem(subreq, req)) {

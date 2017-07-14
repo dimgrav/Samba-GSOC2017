@@ -51,6 +51,14 @@ struct dns_tcp_connection {
 	struct tevent_queue *send_queue;
 };
 
+struct dns_tcp_call {
+	struct dns_tcp_connection *dns_conn;
+	DATA_BLOB in;
+	DATA_BLOB out;
+	uint8_t out_hdr[4];
+	struct iovec out_iov[2];
+};
+
 /* dns tcp request buffer */
 struct tevent_req *dns_tcp_req_send(TALLOC_CTX *mem_ctx,
 					struct tevent_context *ev,
