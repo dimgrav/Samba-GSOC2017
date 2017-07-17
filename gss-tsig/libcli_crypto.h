@@ -5,7 +5,7 @@
  * Copyright (C) 2017 Dimitrios Gravanis
  * 
  * Based on the existing work on Samba Unix SMB/CIFS implementation by
- * Kai Blin Copyright (C) 2011, Stefan Metzmacher Copyright (C) 2014
+ * Kai Blin Copyright (C) 2011, Stefan Metzmacher Copyright (C) 2014.
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -79,12 +79,12 @@ struct dns_client_tkey *dns_find_tkey(struct dns_client_tkey_store *store,
 				      const char *name)
 
 /* make empty tsig rdata packet copy */
-static WERROR dns_empty_tsig(TALLOC_CTX *mem_ctx,
+WERROR dns_empty_tsig(TALLOC_CTX *mem_ctx,
 					struct dns_res_rec *orig_record,
 					struct dns_res_rec *empty_record)
 
 /* generate signed packet */
-static WERROR dns_cli_generate_sig(struct dns_client *dns,
+WERROR dns_cli_generate_sig(struct dns_client *dns,
 		       TALLOC_CTX *mem_ctx,
 		       struct dns_name_packet *packet,
 		       struct dns_request_state *state,

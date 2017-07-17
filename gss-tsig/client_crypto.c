@@ -5,7 +5,7 @@
  * Copyright (C) 2017 Dimitrios Gravanis
  * 
  * Based on the existing work on Samba Unix SMB/CIFS implementation by
- * Kai Blin Copyright (C) 2011, Stefan Metzmacher Copyright (C) 2014
+ * Kai Blin Copyright (C) 2011, Stefan Metzmacher Copyright (C) 2014.
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,8 +24,6 @@
 #include "includes.h"
 #include "lib/crypto/hmacmd5.h"
 #include "system/network.h"
-#include "librpc/ndr/libndr.h"
-#include "librpc/gen_ndr/ndr_dns.h"
 #include "libcli/util/ntstatus.h"
 #include "auth/auth.h"
 #include "auth/gensec/gensec.h"
@@ -97,9 +95,8 @@ static WERROR dns_cli_generate_sig(struct dns_client *dns,
 	uint8_t *buffer = NULL;
 	size_t buffer_len = 0, packet_len = 0;
 	struct dns_client_tkey *tkey = NULL;
-	struct dns_fake_tsig_rec *check_rec = talloc_zero(mem_ctx, struct dns_fake_tsig_rec);
 
-	/* save the keyname from the TSIG request to add MAC later*/
+	/* save the keyname from the TSIG request to add MAC later */
 	tkey = dns_find_tkey(dns->tkeys, state->tsig->name);
 	if (tkey == NULL) {
 		state->key_name = talloc_strdup(state->mem_ctx,
@@ -135,7 +132,7 @@ static WERROR dns_cli_generate_sig(struct dns_client *dns,
 				    buffer, buffer_len, &sig);
 
 	/* get MAC size and save MAC to sig*/
-	sig.length = state->tsig->rdata.tsig_record.mac_size + sig_buff.length;
+	sig.length = state->tsig->rdata.tsig_record.mac_size;
 	sig.data = talloc_memdup(mem_ctx, state->tsig->rdata.tsig_record.mac, sig.length);
 	if (sig.data == NULL) {
 		return WERR_NOT_ENOUGH_MEMORY;
@@ -146,4 +143,3 @@ static WERROR dns_cli_generate_sig(struct dns_client *dns,
 	RSSVAL(buffer, 10, arcount-1);
 
 	return WERROR;
-}
