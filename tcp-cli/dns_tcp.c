@@ -111,6 +111,37 @@ static void dns_tcp_req_recv_reply(struct tevent_req *subreq)
 	ssize_t len;
 	int err = 0;
 
+	/* 
+	 * implements a basic tstream_read_pdu_blob_send/recv() loop -INCOMPLETE-
+	 * -----------------------------------------------------------------------
+	 * struct dns_tcp_connection *dns_conn = tevent_req_callback_data(subreq,
+	 *			      				struct dns_tcp_connection);
+	 * struct dns_server *dns = dns_conn->dns_socket->dns;
+	 * struct dns_tcp_call *call;
+	 * NTSTATUS check;
+	 *
+	 * call = talloc(dns_conn, struct dns_tcp_call);
+	 * call->dns_conn = dns_conn;
+	 *
+	 * check = tstream_read_pdu_blob_recv(subreq, call, &call->in);
+	 * TALLOC_FREE(subreq);
+	 * 
+	 * call->in.data += 2;
+	 * call->in.length -= 2;
+	 * 
+	 * subreq = dns_process_send();
+	 * 
+	 *
+	 * subreq = tstream_read_pdu_blob_send(dns_conn,
+	 *				    dns_conn->conn->event.ctx,
+	 *				    dns_conn->tstream,
+	 * 				    2, 
+	 *				    packet_full_request_u16,
+	 *				    dns_conn);
+	 * 
+	 * tevent_req_set_callback(subreq, dns_tcp_req_recv_reply, dns_conn);
+	 */
+
 	len = tstream_writev_recv(subreq, &err);
 	TALLOC_FREE(subreq);
 
