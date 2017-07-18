@@ -30,7 +30,8 @@
 #include "libcli_crypto.h"
 
 /* make a copy of the original tsig record
-* with null rdata values (for future test purposes) */
+ * with null rdata values (for future test purposes)
+ */
 static WERROR dns_empty_tsig(TALLOC_CTX *mem_ctx,
 					struct dns_res_rec *orig_record,
 					struct dns_res_rec *empty_record)
