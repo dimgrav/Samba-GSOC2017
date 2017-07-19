@@ -118,6 +118,10 @@ static WERROR dns_cli_generate_sig(struct dns_client *dns,
 	packet_len = in->length - tsig_blob.length;
 	packet->arcount--;
 
+	/* count down the arcount field in the buffer */
+	arcount = RSVAL(buffer, 10);
+	RSSVAL(buffer, 10, arcount-1);
+
 	/* append fake_tsig_blob to buffer */
 	buffer_len = packet_len + fake_tsig_blob.length;
 	buffer = talloc_zero_array(mem_ctx, uint8_t, buffer_len);
@@ -139,8 +143,7 @@ static WERROR dns_cli_generate_sig(struct dns_client *dns,
 		return WERR_NOT_ENOUGH_MEMORY;
 	}
 
-	/* count down the arcount field in the buffer */
-	arcount = RSVAL(buffer, 10);
-	RSSVAL(buffer, 10, arcount-1);
+	packet_len += sig.length;
+	packet->arcount++;
 
 	return WERROR;
