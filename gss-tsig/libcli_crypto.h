@@ -78,10 +78,12 @@ struct dns_client_tkey_store {
 struct dns_client_tkey *dns_find_tkey(struct dns_client_tkey_store *store,
 				      const char *name)
 
+bool dns_name_equal(const char *name1, const char *name2);
+
 /* make empty tsig rdata packet copy */
 WERROR dns_empty_tsig(TALLOC_CTX *mem_ctx,
 					struct dns_res_rec *orig_record,
-					struct dns_res_rec *empty_record)
+					struct dns_res_rec *empty_record);
 
 /* generate signed packet */
 WERROR dns_cli_generate_sig(struct dns_client *dns,

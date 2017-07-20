@@ -29,8 +29,13 @@
 #include "auth/gensec/gensec.h"
 #include "libcli_crypto.h"
 
-/* make a copy of the original tsig record
+#undef DBGC_CLASS
+#define DBGC_CLASS DBGC_DNS
+
+/* 
+ * make a copy of the original tsig record
  * with null rdata values (for future test purposes)
+ * --- probably wrong memdup allocations! ---
  */
 static WERROR dns_empty_tsig(TALLOC_CTX *mem_ctx,
 					struct dns_res_rec *orig_record,
@@ -45,15 +50,15 @@ static WERROR dns_empty_tsig(TALLOC_CTX *mem_ctx,
 	
 	/* tsig rdata field in the new record */	
 	empty_record->rdata.tsig_record.algorithm_name = talloc_strdup(mem_ctx, NULL);
-	empty_record->rdata.tsig_record.time_prefix = NULL;
-	empty_record->rdata.tsig_record.time = NULL;
-	empty_record->rdata.tsig_record.fudge = NULL;
-	empty_record->rdata.tsig_record.mac_size = NULL;
-	empty_record->rdata.tsig_record.mac = talloc_memdup(mem_ctx, NULL, NULL);
-	empty_record->rdata.tsig_record.original_id = NULL;
-	empty_record->rdata.tsig_record.error = NULL;
+	empty_record->rdata.tsig_record.time_prefix = 0;
+	empty_record->rdata.tsig_record.time = 0;
+	empty_record->rdata.tsig_record.fudge = 0;
+	empty_record->rdata.tsig_record.mac_size = 0;
+	empty_record->rdata.tsig_record.mac = talloc_memdup(mem_ctx, NULL, 0);
+	empty_record->rdata.tsig_record.original_id = 0;
+	empty_record->rdata.tsig_record.error = 0;
 	empty_record->rdata.tsig_record.other_size = NULL;
-	empty_record->rdata.tsig_record.other_data = talloc_memdup(mem_ctx, NULL, NULL);
+	empty_record->rdata.tsig_record.other_data = talloc_memdup(mem_ctx, NULL, 0);
 
 	return WERR_OK;
 }
@@ -84,18 +89,39 @@ struct dns_client_tkey *dns_find_tkey(struct dns_client_tkey_store *store,
 }
 
 /* generate signature */
-static WERROR dns_cli_generate_sig(struct dns_client *dns,
+static WERROR dns_cli_generate_tsig(struct dns_client *dns,
 		       				TALLOC_CTX *mem_ctx,
 		       				struct dns_request_state *state,
 		        			struct dns_name_packet *packet,
 		        			DATA_BLOB *in)
 {
-	NTSTATUS gen_sig;
+	int tsig_flag = 0;
+	struct dns_client_tkey *tkey = NULL;
 	uint16_t i, arcount = 0;
-	DATA_BLOB tsig_blob, fake_tsig_blob, sig;
+	DATA_BLOB tsig_blob, fake_tsig_blob;
 	uint8_t *buffer = NULL;
 	size_t buffer_len = 0, packet_len = 0;
-	struct dns_client_tkey *tkey = NULL;
+	
+	NTSTATUS gen_sig;
+	DATA_BLOB sig = (DATA_BLOB) {.data = NULL, .length = 0};
+	struct dns_res_rec *tsig = NULL;
+
+	/* find TSIG record in inbound packet */
+	for (i=0; i < packet->arcount; i++) {
+		if (packet->additional[i].rr_type == DNS_QTYPE_TSIG) {
+			tsig_flag = 1;
+			break;
+		}
+	}
+	if (tsig_flag != 1) {
+		return WERR_OK;
+	}
+
+	/* check TSIG record format consistency */
+	if (tsig_flag == 1 && i + 1 != packet->arcount) {
+		DEBUG(1, ("TSIG format inconsistent!\n"));
+		return DNS_ERR(FORMAT_ERROR);
+	}
 
 	/* save the keyname from the TSIG request to add MAC later */
 	tkey = dns_find_tkey(dns->tkeys, state->tsig->name);
@@ -108,17 +134,17 @@ static WERROR dns_cli_generate_sig(struct dns_client *dns,
 		state->tsig_error = DNS_RCODE_BADKEY;
 		return DNS_ERR(NOTAUTH);
 	}
-
 	state->key_name = talloc_strdup(state->mem_ctx, tkey->name);
 	if (state->key_name == NULL) {
 		return WERR_NOT_ENOUGH_MEMORY;
 	}
 
-	/* preserve input packet but remove tsig record bytes */
+	/* 
+	 * preserve input packet but remove TSIG record bytes
+	 * then count down the arcount field in the packet 
+	 */
 	packet_len = in->length - tsig_blob.length;
 	packet->arcount--;
-
-	/* count down the arcount field in the buffer */
 	arcount = RSVAL(buffer, 10);
 	RSSVAL(buffer, 10, arcount-1);
 
@@ -130,7 +156,7 @@ static WERROR dns_cli_generate_sig(struct dns_client *dns,
 	}
 	
 	memcpy(buffer, in->data, packet_len);
-	memcpy(buffer + packet_len, fake_tsig_blob.data, fake_tsig_blob.length);
+	memcpy(buffer, fake_tsig_blob.data, fake_tsig_blob.length);
 
 	/* generate signature */
 	gen_sig = gensec_sign_packet(tkey->gensec, mem_ctx, buffer, buffer_len,
@@ -143,7 +169,36 @@ static WERROR dns_cli_generate_sig(struct dns_client *dns,
 		return WERR_NOT_ENOUGH_MEMORY;
 	}
 
-	packet_len += sig.length;
-	packet->arcount++;
+	/* rebuild packet with MAC from gensec_sign_packet() */
+	tsig = talloc_zero(mem_ctx, struct dns_res_rec);
 
+	tsig->name = talloc_strdup(tsig, state->key_name);
+	if (tsig->name == NULL) {
+		return WERR_NOT_ENOUGH_MEMORY;
+	}
+	tsig->rr_class = DNS_QCLASS_ANY;
+	tsig->rr_type = DNS_QTYPE_TSIG;
+	tsig->ttl = 0;
+	tsig->length = UINT16_MAX;
+	tsig->rdata.tsig_record.algorithm_name = talloc_strdup(tsig, "gss-tsig");
+	tsig->rdata.tsig_record.time_prefix = 0;
+	tsig->rdata.tsig_record.time = current_time;
+	tsig->rdata.tsig_record.fudge = 300;
+	tsig->rdata.tsig_record.error = state->tsig_error;
+	tsig->rdata.tsig_record.original_id = packet->id;
+	tsig->rdata.tsig_record.other_size = 0;
+	tsig->rdata.tsig_record.other_data = NULL;
+	if (sig.length > 0) {
+		tsig->rdata.tsig_record.mac_size = sig.length;
+		tsig->rdata.tsig_record.mac = talloc_memdup(tsig, sig.data, sig.length);
+	}
+	
+	packet->additional = talloc_realloc(mem_ctx, packet->additional,
+					    struct dns_res_rec,
+					    packet->arcount + 1);
+	if (packet->additional == NULL) {
+		return WERR_NOT_ENOUGH_MEMORY;
+	}
+	packet->arcount++;
+	
 	return WERROR;
