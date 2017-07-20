@@ -201,4 +201,4 @@ static WERROR dns_cli_generate_tsig(struct dns_client *dns,
 	}
 	packet->arcount++;
 	
-	return WERROR;
+	return WERR_OK;
