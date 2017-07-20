@@ -32,6 +32,7 @@ uint8_t werr_to_dns_err(WERROR werr);
 #define DNS_ERR(err_str) WERR_DNS_ERROR_RCODE_##err_str
 
 /* client structures */
+/* I am not sure if this is correct, does the client use dns server zones? */
 struct dns_client_zone {
 	struct dns_client_zone *prev, *next;
 	const char *name;
