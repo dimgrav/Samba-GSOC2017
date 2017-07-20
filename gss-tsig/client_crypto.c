@@ -88,7 +88,7 @@ struct dns_client_tkey *dns_find_tkey(struct dns_client_tkey_store *store,
 	return tkey;
 }
 
-/* generate signature */
+/* generate signature and rebuild packet with TSIG */
 static WERROR dns_cli_generate_tsig(struct dns_client *dns,
 		       				TALLOC_CTX *mem_ctx,
 		       				struct dns_request_state *state,
@@ -105,6 +105,7 @@ static WERROR dns_cli_generate_tsig(struct dns_client *dns,
 	NTSTATUS gen_sig;
 	DATA_BLOB sig = (DATA_BLOB) {.data = NULL, .length = 0};
 	struct dns_res_rec *tsig = NULL;
+	time_t current_time = time(NULL);
 
 	/* find TSIG record in inbound packet */
 	for (i=0; i < packet->arcount; i++) {
