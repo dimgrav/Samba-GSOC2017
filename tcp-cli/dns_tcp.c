@@ -80,11 +80,14 @@ struct tevent_req *dns_tcp_req_send(TALLOC_CTX *mem_ctx,
 	}
 
 	state->tstream = stream;
-	state->query_len = count;
+	state->v_count = count;
 
-	// dump_data(10, *vector, count); not sure how dump data works with pointers
+	/* not sure how dump data works with pointers
+	 * followed source4/heimdal/lib/roken/dumpdata.c
+	 */
+	dump_data(10, vector, count);
 
-	subreq = tstream_writev_send(mem_ctx, ev, stream, *vector, count);
+	subreq = tstream_writev_send(mem_ctx, ev, stream, vector, count);
 	if (tevent_req_nomem(subreq, req)) {
 		return tevent_req_post(req, ev);
 	}
@@ -108,7 +111,7 @@ static void dns_tcp_req_recv_reply(struct tevent_req *subreq)
 						struct tevent_req);
 	struct dns_tcp_request_state *state = tevent_req_data(req,
 						struct dns_tcp_request_state);
-	ssize_t len;
+	ssize_t stream_len;
 	int err = 0;
 
 	/* 
@@ -142,21 +145,22 @@ static void dns_tcp_req_recv_reply(struct tevent_req *subreq)
 	 * tevent_req_set_callback(subreq, dns_tcp_req_recv_reply, dns_conn);
 	 */
 
-	len = tstream_writev_recv(subreq, &err);
+	stream_len = tstream_writev_recv(subreq, &err);
 	TALLOC_FREE(subreq);
 
-	if (len == -1 && err != 0) {
+	if (stream_len == -1 && err != 0) {
 		tevent_req_error(req, err);
 		return;
 	}
 
-	if (len != state->query_len) {
+	if (stream_len != state->v_count) {
 		tevent_req_error(req, EIO);
 		return;
 	}
 
 	// need help here on how to pass the vector
-	subreq = tstream_readv_pdu_send(state, state->ev, state->stream, , );
+	subreq = tstream_readv_pdu_send(state, state->ev, state->stream, 
+								next_vector_fn, next_vector_private);
 	if (tevent_req_nomem(subreq, req)) {
 		return;
 	}
@@ -173,18 +177,18 @@ static void dns_tcp_req_done(struct tevent_req *subreq)
 	struct dns_tcp_request_state *state = tevent_req_data(req,
 						struct dns_tcp_request_state);
 
-	ssize_t len;
+	ssize_t stream_len;
 	int err = 0;
 
-	len = tstream_readv_pdu_recv(subreq, &err);
+	stream_len = tstream_readv_pdu_recv(subreq, &err);
 	TALLOC_FREE(subreq);
 
-	if (len == -1 && err != 0) {
+	if (stream_len == -1 && err != 0) {
 		tevent_req_error(req, err);
 		return;
 	}
 
-	state->reply_len = len;
+	state->reply_len = stream_len;
 	dump_data(10, state->reply, state->reply_len);
 	tevent_req_done(req);
 }

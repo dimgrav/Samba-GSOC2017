@@ -39,7 +39,7 @@ struct dns_socket {
 struct dns_tcp_request_state {
 	struct tevent_context *ev;
 	struct tstream_context *stream;
-	size_t query_len;
+	size_t v_count;
 	uint32_t *reply;
 	size_t reply_len;
 };
