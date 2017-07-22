@@ -35,7 +35,7 @@
 /* 
  * make a copy of the original tsig record
  * with null rdata values (for future test purposes)
- * --- probably wrong memdup allocations! ---
+ * --- probably wrong use of memset(), all fields considered as pointers?  ---
  */
 static WERROR dns_empty_tsig(TALLOC_CTX *mem_ctx,
 					struct dns_res_rec *orig_record,
