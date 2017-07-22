@@ -33,7 +33,7 @@ struct tsocket_address;
 
 struct dns_socket {
 	struct dns_server *dns;
-	struct tsocket_address *local_address;	
+	struct tsocket_address *local_address;
 };
 
 struct dns_tcp_request_state {
