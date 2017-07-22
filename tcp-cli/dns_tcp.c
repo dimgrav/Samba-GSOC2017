@@ -137,13 +137,13 @@ static void dns_tcp_req_recv_reply(struct tevent_req *subreq)
 	/* response loop */
 	struct dns_server *dns = dns_conn->dns_socket->dns; // uses the same iface with server
 	struct dns_tcp_connection *dns_conn = tevent_req_callback_data(subreq,
-				      							struct dns_tcp_connection);
+			struct dns_tcp_connection);
 	struct dns_tcp_call *call;
 
 	call = talloc(dns_conn, struct dns_tcp_call);
 	if (call == NULL) {
 		dns_tcp_terminate_connection(dns_conn, "dns_tcp_req_recv_reply: "
-				"no memory for dns_tcp_call");
+				"no memory for dns_tcp_call~");
 		return;
 	}
 	call->dns_conn = dns_conn;
@@ -161,7 +161,7 @@ static void dns_tcp_req_recv_reply(struct tevent_req *subreq)
 	subreq = dns_process_send(call, dns->task->event_ctx, dns, &call->in);
 	if (subreq == NULL) {
 		dns_tcp_terminate_connection(dns_conn,
-		"dns_tcp_req_recv_reply: dns process recv failure!");
+		"dns_tcp_req_recv_reply: dns process send failure!");
 		return;
 	}
 	tevent_req_set_callback(subreq, dns_tcp_req_done, call);
