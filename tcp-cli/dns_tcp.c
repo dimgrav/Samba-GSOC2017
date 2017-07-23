@@ -93,9 +93,8 @@ struct tevent_req *dns_tcp_req_send(TALLOC_CTX *mem_ctx,
 		tevent_req_error(req, errno);
 		return tevent_req_post(req, ev);
 	}
-
 	tevent_req_set_callback(socreq, dns_tcp_req_send, req);
-	
+
 	state->tstream = stream;
 	state->v_count = count;
 
@@ -130,6 +129,7 @@ static void dns_tcp_req_recv_reply(struct tevent_req *subreq)
 						struct dns_tcp_request_state);
 	ssize_t stream_len;
 	int err = 0;
+	NTSTATUS status;
 
 	stream_len = tstream_writev_recv(subreq, &err);
 	TALLOC_FREE(subreq);
@@ -153,14 +153,12 @@ static void dns_tcp_req_recv_reply(struct tevent_req *subreq)
 	call = talloc(dns_conn, struct dns_tcp_call);
 	if (call == NULL) {
 		dns_tcp_terminate_connection(dns_conn, "dns_tcp_req_recv_reply: "
-				"no memory for dns_tcp_call~");
+				"no memory for dns_tcp_call!");
 		return;
 	}
 	call->dns_conn = dns_conn;
 
-	status = tstream_read_pdu_blob_recv(subreq,
-					    call,
-					    &call->in);
+	status = tstream_read_pdu_blob_recv(subreq, call, &call->in);
 	TALLOC_FREE(subreq);
 	if (!NT_STATUS_IS_OK(status)) {
 		dns_tcp_terminate_connection(dns_conn,
