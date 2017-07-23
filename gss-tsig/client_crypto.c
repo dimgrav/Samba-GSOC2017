@@ -36,6 +36,7 @@
  * make a copy of the original tsig record
  * with null rdata values (for future test purposes)
  * --- probably wrong use of memset(), all fields considered as pointers?  ---
+ * will include WERROR handling for t allocations
  */
 static WERROR dns_empty_tsig(TALLOC_CTX *mem_ctx,
 					struct dns_res_rec *orig_record,
@@ -49,18 +50,21 @@ static WERROR dns_empty_tsig(TALLOC_CTX *mem_ctx,
 	empty_record->length = orig_record->length;
 	
 	/* tsig rdata field in the new record */	
-	memset(empty_record->rdata.tsig_record.algorithm_name, '\0', sizeof(dns_string));
+	empty_record->rdata.tsig_record.algorithm_name = talloc_memdup(mem_ctx, 
+							orig_record->rdata.tsig_record.algorithm_name, 0);
 	memset(empty_record->rdata.tsig_record.time_prefix, 0, sizeof(uint16_t));
 	memset(empty_record->rdata.tsig_record.time, 0, sizeof(uint32_t));
 	memset(empty_record->rdata.tsig_record.fudge, 0, sizeof(uint16_t));
 	memset(empty_record->rdata.tsig_record.mac_size, 0, sizeof(uint16_t));
-	memset(empty_record->rdata.tsig_record.mac, 0, 
-		(empty_record->rdata.tsig_record.mac_size)*sizeof(uint8_t));
+	empty_record->rdata.tsig_record.mac = talloc_memdup(mem_ctx,
+							orig_record->rdata.tsig_record.mac,
+							empty_record->rdata.tsig_record.mac_size);
 	memset(empty_record->rdata.tsig_record.original_id, 0, sizeof(uint16_t));
 	memset(empty_record->rdata.tsig_record.error, 0, sizeof(uint16_t));
 	memset(empty_record->rdata.tsig_record.other_size, 0, sizeof(uint16_t));
-	memset(empty_record->rdata.tsig_record.other_data, 0, 
-		(empty_record->rdata.tsig_record.other_size)*sizeof(uint8_t));
+	empty_record->rdata.tsig_record.other_data = talloc_memdup(mem_ctx,
+							orig_record->rdata.tsig_record.other_data,
+							empty_record->rdata.tsig_record.other_size);
 
 	return WERR_OK;
 }
