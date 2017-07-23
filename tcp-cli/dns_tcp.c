@@ -52,11 +52,11 @@ struct tevent_req *dns_tcp_req_send(TALLOC_CTX *mem_ctx,
 					struct iovec *vector,
 					size_t count)
 {
-	struct tevent_req *req, *subreq;
+	struct tevent_req *req, *subreq, *socreq;
 	struct dns_tcp_request_state *state;
 	struct tsocket_address *local_addr, *server_addr;
 	struct tstream_context *stream;
-	int req_ret;
+	int req_ret, soc_ret, err = 0;
 
 	req = tevent_req_create(mem_ctx, &state, struct dns_tcp_request_state);
 	if (req == NULL) {
@@ -80,12 +80,22 @@ struct tevent_req *dns_tcp_req_send(TALLOC_CTX *mem_ctx,
 		return tevent_req_post(req, ev);
 	}
 
-	req_ret = tstream_inet_tcp_connect_send(mem_ctx, ev, local_addr, server_addr);
-	if (req_ret != 0) {
+	/* must be reviewed! */
+	soc_ret = tstream_inet_tcp_connect_recv(socreq, err, mem_ctx, stream, NULL);
+	TALLOC_FREE(socreq);
+	if (soc_ret == -1 && err != 0) {
+		tevent_req_error(socreq, err);
+		return tevent_req_post(req, ev);
+	}
+
+	socreq = tstream_inet_tcp_connect_send(mem_ctx, ev, local_addr, server_addr);
+	if (tevent_req_nomem(socreq, req)) {
 		tevent_req_error(req, errno);
 		return tevent_req_post(req, ev);
 	}
 
+	tevent_req_set_callback(socreq, dns_tcp_req_send, req);
+	
 	state->tstream = stream;
 	state->v_count = count;
 
