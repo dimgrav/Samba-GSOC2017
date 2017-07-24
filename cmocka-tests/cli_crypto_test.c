@@ -49,7 +49,7 @@ static int empty_sig_test(TALLOC_CTX *mem_ctx,
 					struct dns_res_rec *empty_record)
 {
 	/* pending */
-	return 0;
+	
 }
 
 /* 
@@ -65,4 +65,10 @@ static int gen_tsig_test(struct dns_client *dns,
 {
 	/* pending */
 	return 0;
+}
+
+/* run test suite */
+int main(void)
+{
+	return cmocka_run_group_tests(tests, NULL, NULL);
 }
