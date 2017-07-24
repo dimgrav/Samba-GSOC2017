@@ -49,7 +49,12 @@ static WERROR dns_empty_tsig(TALLOC_CTX *mem_ctx,
 	empty_record->ttl = orig_record->ttl;
 	empty_record->length = orig_record->length;
 	
-	/* tsig rdata field in the new record */	
+	/* tsig rdata field in the new record */
+	/* the smooth way! */
+	ZERO_STRUCT(empty_record->rdata.tsig_record);
+
+	/* 
+	---the long way---
 	empty_record->rdata.tsig_record.algorithm_name = talloc_memdup(mem_ctx, 
 							orig_record->rdata.tsig_record.algorithm_name, 0);
 	memset(empty_record->rdata.tsig_record.time_prefix, 0, sizeof(uint16_t));
@@ -65,6 +70,7 @@ static WERROR dns_empty_tsig(TALLOC_CTX *mem_ctx,
 	empty_record->rdata.tsig_record.other_data = talloc_memdup(mem_ctx,
 							orig_record->rdata.tsig_record.other_data,
 							empty_record->rdata.tsig_record.other_size);
+	*/
 
 	return WERR_OK;
 }
