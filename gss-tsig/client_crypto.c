@@ -44,13 +44,17 @@ static WERROR dns_empty_tsig(TALLOC_CTX *mem_ctx,
 {
 	/* see /libprc/idl/dns.idl for PIDL tsig definition */
 	empty_record->name = talloc_strdup(mem_ctx, orig_record->name);
+	W_ERROR_HAVE_NO_MEMORY(empty_record->name);
 	empty_record->rr_type = orig_record->rr_type;
 	empty_record->rr_class = orig_record->rr_class;
 	empty_record->ttl = orig_record->ttl;
 	empty_record->length = orig_record->length;
 	
-	/* tsig rdata field in the new record */
+	/* empty tsig rdata field in the new record */
 	/* the smooth way! */
+	empty_record->rdata.tsig_record.algorithm_name = talloc_strdup(mem_ctx, 
+							orig_record->rdata.tsig_record.algorithm_name);
+	W_ERROR_HAVE_NO_MEMORY(empty_record->rdata.tsig_record.algorithm_name);
 	ZERO_STRUCT(empty_record->rdata.tsig_record);
 
 	/* 
