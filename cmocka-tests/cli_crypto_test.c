@@ -39,6 +39,11 @@
 #include "auth/gensec/gensec.h"
 #include "libcli_crypto.h"
 
+
+#define group_test_setup()
+
+/* test suite */
+
 /* 
  * error codes
  *  0 -	success
@@ -49,7 +54,18 @@ static int empty_sig_test(TALLOC_CTX *mem_ctx,
 					struct dns_res_rec *empty_record)
 {
 	/* pending */
+	int status;
+
+	expect_memory(dns_empty_tsig, orig_record, mem_ctx, sizeof(dns_res_rec));
+	expect_memory(dns_empty_tsig, empty_record, mem_ctx, sizeof(dns_res_rec));
+
 	will_return(dns_empty_tsig, WERR_OK);
+
+	if (status != 0) {
+		/* code */
+		return -1;
+	}
+
 	return 0;
 }
 
@@ -62,7 +78,15 @@ static int tkey_test(struct dns_client_tkey_store *store,
 				      const char *name)
 {
 	/* pending */
+	int status;
+
 	will_return(dns_find_tkey, tkey);
+
+	if (status != 0) {
+		/* code */
+		return -1;
+	}
+
 	return 0;
 }
 
@@ -78,7 +102,16 @@ static int gen_tsig_test(struct dns_client *dns,
 		        			DATA_BLOB *in)
 {
 	/* pending */
+	int status;
+
 	will_return(dns_cli_generate_tsig, WERROR);
+
+	if (status != 0)
+	{
+		/* code */
+		return -1;
+	}
+
 	return 0;
 }
 
