@@ -49,7 +49,21 @@ static int empty_sig_test(TALLOC_CTX *mem_ctx,
 					struct dns_res_rec *empty_record)
 {
 	/* pending */
-	
+	will_return(dns_empty_tsig, WERR_OK);
+	return 0;
+}
+
+/* 
+ * error codes
+ *  0 -	success
+ * -1 -	failure
+ */
+static int tkey_test(struct dns_client_tkey_store *store,
+				      const char *name)
+{
+	/* pending */
+	will_return(dns_find_tkey, tkey);
+	return 0;
 }
 
 /* 
@@ -64,6 +78,7 @@ static int gen_tsig_test(struct dns_client *dns,
 		        			DATA_BLOB *in)
 {
 	/* pending */
+	will_return(dns_cli_generate_tsig, WERROR);
 	return 0;
 }
 
