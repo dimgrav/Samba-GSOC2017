@@ -39,43 +39,52 @@
 #include "auth/gensec/gensec.h"
 #include "libcli_crypto.h"
 
-
-#define group_test_setup()
-
 /* test suite */
+
+static const struct dns_res_rec *test_record(TALLOC_CTX *mem_ctx) {
+
+	struct dns_res_rec *test_rec;
+
+	test_rec->name = "TEST_RECORD";
+	test_rec->rr_type = DNS_QTYPE_TSIG;
+	test_rec->rr_class = DNS_QCLASS_ANY;
+	test_rec->ttl = 0;
+	test_rec->length = UINT16_MAX;
+	/* rdata */
+	test_rec->rdata.tsig_record.algorithm_name = talloc_strdup(tsig, "gss-tsig");
+	test_rec->rdata.tsig_record.time_prefix = 0;
+	test_rec->rdata.tsig_record.time = current_time;
+	test_rec->rdata.tsig_record.fudge = 300;
+	test_rec->rdata.tsig_record.mac_size = UINT16_MAX;
+	test_rec->rdata.tsig_record.mac = NULL;
+	test_rec->rdata.tsig_record.original_id = UINT16_MAX;
+	test_rec->rdata.tsig_record.error = UINT16_MAX;
+	test_rec->rdata.tsig_record.other_size = 0;
+	test_rec->rdata.tsig_record.other_data = NULL;
+
+	return test_rec;
+};
 
 /* 
  * error codes
- *  0 -	success
- * -1 -	failure
+ * calls fail() if assert_memory_equal() is false
  */
-static int empty_sig_test(TALLOC_CTX *mem_ctx,
-					struct dns_res_rec *orig_record,
-					struct dns_res_rec *empty_record)
+static void empty_sig_test(void **state)
 {
 	/* pending */
-	int status;
+	orig_record = test_record(mem_ctx);
+	empty_record = orig_record;
+	ZERO_STRUCT(empty_record->rdata.tsig_record);
 
-	expect_memory(dns_empty_tsig, orig_record, mem_ctx, sizeof(dns_res_rec));
-	expect_memory(dns_empty_tsig, empty_record, mem_ctx, sizeof(dns_res_rec));
-
-	will_return(dns_empty_tsig, WERR_OK);
-
-	if (status != 0) {
-		/* code */
-		return -1;
-	}
-
-	return 0;
+	assert_memory_equal(orig_record, empty_record, sizeof(dns_res_rec));
 }
 
 /* 
  * error codes
- *  0 -	success
- * -1 -	failure
+ *  0 -	success: tkey found in record and returned
+ * -1 -	failure: tkey not found
  */
-static int tkey_test(struct dns_client_tkey_store *store,
-				      const char *name)
+static int tkey_test(void **state)
 {
 	/* pending */
 	int status;
@@ -92,14 +101,10 @@ static int tkey_test(struct dns_client_tkey_store *store,
 
 /* 
  * error codes
- *  0 -	success
- * -1 -	failure
+ *  0 -	success: packet signed with MAC and rebuilt
+ * -1 -	failure: failed to rebuild packet
  */
-static int gen_tsig_test(struct dns_client *dns,
-		       				TALLOC_CTX *mem_ctx,
-		       				struct dns_request_state *state,
-		        			struct dns_name_packet *packet,
-		        			DATA_BLOB *in)
+static int gen_tsig_test(void **state)
 {
 	/* pending */
 	int status;
@@ -118,5 +123,13 @@ static int gen_tsig_test(struct dns_client *dns,
 /* run test suite */
 int main(void)
 {
+	/* test structure */
+	const struct CMUnitTest tests[] = {
+		cmocka_unit_test(empty_sig_test);
+		cmocka_unit_test(tkey_test);
+		cmocka_unit_test(gen_tsig_test);	
+	};
+
+	cmocka_set_message_output(CM_OUTPUT_SUBUNIT);
 	return cmocka_run_group_tests(tests, NULL, NULL);
 }
