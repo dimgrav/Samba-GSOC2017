@@ -68,7 +68,12 @@ static const struct dns_res_rec *test_record(TALLOC_CTX *mem_ctx) {
 	return test_rec;
 };
 
-
+/* 
+ * error codes
+ * calls fail() if assert_memory_equal() is false
+ *  0 - successful record format
+ * -1 - record inconsistent/not null
+ */
 static int empty_sig_test(void **state)
 {
 	/* pending */
