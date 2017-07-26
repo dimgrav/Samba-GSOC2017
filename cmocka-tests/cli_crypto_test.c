@@ -44,14 +44,17 @@
 static const struct dns_res_rec *test_record(TALLOC_CTX *mem_ctx) {
 
 	struct dns_res_rec *test_rec;
-
-	test_rec->name = "TEST_RECORD";
+	/* unsure about talloc_set_name_const() here
+	 * is there something more apropriate in talloc for
+	 * assigning a specific strict in a mem_ctx?
+	 */
+	test_rec->name = talloc_set_name_const(mem_ctx, "TEST_RECORD");
 	test_rec->rr_type = DNS_QTYPE_TSIG;
 	test_rec->rr_class = DNS_QCLASS_ANY;
 	test_rec->ttl = 0;
 	test_rec->length = UINT16_MAX;
 	/* rdata */
-	test_rec->rdata.tsig_record.algorithm_name = talloc_strdup(tsig, "gss-tsig");
+	test_rec->rdata.tsig_record.algorithm_name = talloc_set_name_const(mem_ctx, "ALG_NAME");
 	test_rec->rdata.tsig_record.time_prefix = 0;
 	test_rec->rdata.tsig_record.time = current_time;
 	test_rec->rdata.tsig_record.fudge = 300;
@@ -68,15 +71,26 @@ static const struct dns_res_rec *test_record(TALLOC_CTX *mem_ctx) {
 /* 
  * error codes
  * calls fail() if assert_memory_equal() is false
+ *  0 - successful record format
+ * -1 - record inconsistent/not null
  */
-static void empty_sig_test(void **state)
+static int empty_sig_test(void **state)
 {
 	/* pending */
 	orig_record = test_record(mem_ctx);
-	empty_record = orig_record;
+	empty_record = talloc_memdup(mem_ctx, orig_record, sizeof(orig_record));
 	ZERO_STRUCT(empty_record->rdata.tsig_record);
 
 	assert_memory_equal(orig_record, empty_record, sizeof(dns_res_rec));
+
+	/* this should work for checking the entire tsig rdata field */
+	if (empty_record->rdata.tsig_record != NULL) {
+		return -1;
+	}
+	
+	TALLOC_FREE(orig_record);
+	TALLOC_FREE(empty_record);
+	return 0;
 }
 
 /* 
