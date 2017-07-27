@@ -88,7 +88,7 @@ static int empty_sig_test(void **state)
 	/* pending */
 	WERROR werror;
 	struct dns_res_rec *orig_record = test_record(mem_ctx);
-	struct dns_res_rec *empty_record;
+	struct dns_res_rec *empty_record = NULL;
 	assert_memory_equal(orig_record, empty_record, sizeof(dns_res_rec));
 
 	/* this should work for checking the entire tsig rdata field */
@@ -117,10 +117,10 @@ static int tkey_test(void **state)
 	struct dns_client_tkey_store *test_store;
 	const char *test_name = "TEST_TKEY";
 	
-	struct dns_client_tkey *nametest = test_tkey_name();
+	struct dns_client_tkey *testing = test_tkey_name();
 	struct dns_client_tkey *verifier = dns_find_tkey(test_store, test_name);
 
-	if (nametest->name != verifier->name) {
+	if (testing->name != verifier->name) {
 		return -1;
 	}
 
@@ -134,17 +134,24 @@ static int tkey_test(void **state)
  */
 static int gen_tsig_test(void **state)
 {
+	/* incomplete declarations */
+	TALLOC_CTX *mem_ctx;
+	DATA_BLOB in_test = (DATA_BLOB) {.data = NULL, .length = SIZE_MAX};
+	struct dns_client *test_client;
+	struct dns_request_state *test_state;
+	struct dns_name_packet *test_packet;
+
 	/* pending */
-	int status;
 
-	will_return(dns_cli_generate_tsig, WERROR);
-
-	if (status != 0)
+	/* test for TSIG search in packet */
+	WERROR w_tsig_found;
+	dns_cli_generate_tsig();
+	if (w_tsig_found != WERR_OK)
 	{
 		/* code */
 		return -1;
 	}
-
+	
 	return 0;
 }
 
