@@ -73,7 +73,7 @@ static const struct dns_res_rec *test_record(TALLOC_CTX *mem_ctx) {
  * error codes
  *  0 : successful record format
  * -1 : record inconsistent/not null
- * -2 : dns_empty_tsig test failed
+ * -2 : dns_empty_tsig() test failed
  */
 static int empty_sig_test(void **state)
 {
