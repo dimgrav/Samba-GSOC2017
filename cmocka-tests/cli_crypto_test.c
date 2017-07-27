@@ -41,6 +41,14 @@
 
 /* test suite */
 
+static const struct dns_client_tkey *test_tkey_name() {
+	
+	struct dns_client_tkey *test_tkey = NULL;
+	test_tkey->name = "TEST_TKEY";
+
+	return test_tkey;
+};
+
 static const struct dns_res_rec *test_record(TALLOC_CTX *mem_ctx) {
 
 	struct dns_res_rec *test_rec;
@@ -100,18 +108,17 @@ static int empty_sig_test(void **state)
 
 /* 
  * error codes
- *  0 -	success: tkey found in record and returned
- * -1 -	failure: tkey not found
+ *  0 :	success: tkey name found in record and returned
+ * -1 :	failure: tkey name not found
  */
 static int tkey_test(void **state)
 {
 	/* pending */
-	int status;
-
 	will_return(dns_find_tkey, tkey);
 
-	if (status != 0) {
-		/* code */
+	struct dns_client_tkey *nametest = test_tkey_name();
+
+	if (nametest->name != "TEST_TKEY") {
 		return -1;
 	}
 
