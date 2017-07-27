@@ -69,18 +69,18 @@ static const struct dns_res_rec *test_record(TALLOC_CTX *mem_ctx) {
 };
 
 /* 
- * error codes
  * calls fail() if assert_memory_equal() is false
- *  0 - successful record format
- * -1 - record inconsistent/not null
+ * error codes
+ *  0 : successful record format
+ * -1 : record inconsistent/not null
+ * -2 : dns_empty_tsig test failed
  */
 static int empty_sig_test(void **state)
 {
 	/* pending */
-	orig_record = test_record(mem_ctx);
-	empty_record = talloc_memdup(mem_ctx, orig_record, sizeof(orig_record));
-	ZERO_STRUCT(empty_record->rdata.tsig_record);
-
+	WERROR werror;
+	struct dns_res_rec *orig_record = test_record(mem_ctx);
+	struct dns_res_rec *empty_record;
 	assert_memory_equal(orig_record, empty_record, sizeof(dns_res_rec));
 
 	/* this should work for checking the entire tsig rdata field */
@@ -88,6 +88,11 @@ static int empty_sig_test(void **state)
 		return -1;
 	}
 	
+	werror = dns_empty_tsig(mem_ctx, orig_record, empty_record);
+	if (werror != WERR_OK) {
+		return -2;
+	}
+
 	TALLOC_FREE(orig_record);
 	TALLOC_FREE(empty_record);
 	return 0;
