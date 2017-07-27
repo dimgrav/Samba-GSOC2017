@@ -114,8 +114,6 @@ static int empty_sig_test(void **state)
 static int tkey_test(void **state)
 {
 	/* pending */
-	will_return(dns_find_tkey, tkey);
-
 	struct dns_client_tkey *nametest = test_tkey_name();
 
 	if (nametest->name != "TEST_TKEY") {
