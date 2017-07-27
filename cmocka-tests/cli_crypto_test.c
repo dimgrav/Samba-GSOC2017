@@ -113,10 +113,13 @@ static int empty_sig_test(void **state)
  */
 static int tkey_test(void **state)
 {
+	struct dns_client_tkey_store *test_store;
+	const char *test_name = "TEST_TKEY";
 	/* pending */
 	struct dns_client_tkey *nametest = test_tkey_name();
+	struct dns_client_tkey *verifier = dns_find_tkey(test_store, test_name);
 
-	if (nametest->name != "TEST_TKEY") {
+	if (nametest->name != test_name) {
 		return -1;
 	}
 
