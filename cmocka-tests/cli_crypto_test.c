@@ -41,14 +41,6 @@
 
 /* test suite */
 
-static const struct dns_client_tkey *test_tkey_name() {
-	
-	struct dns_client_tkey *test_tkey = NULL;
-	test_tkey->name = "TEST_TKEY";
-
-	return test_tkey;
-};
-
 static const struct dns_res_rec *test_record(TALLOC_CTX *mem_ctx) {
 
 	struct dns_res_rec *test_rec;
@@ -76,12 +68,20 @@ static const struct dns_res_rec *test_record(TALLOC_CTX *mem_ctx) {
 	return test_rec;
 };
 
+static const struct dns_client_tkey *test_tkey_name() {
+	
+	struct dns_client_tkey *test_tkey = NULL;
+	test_tkey->name = "TEST_TKEY";
+
+	return test_tkey;
+};
+
 /* 
  * calls fail() if assert_memory_equal() is false
  * error codes
  *  0 : test completed succesfully
  * -1 : record inconsistent/not null
- * -2 : dns_empty_tsig() test failed
+ * -2 : wrong WERROR output
  */
 static int empty_sig_test(void **state)
 {
@@ -113,13 +113,14 @@ static int empty_sig_test(void **state)
  */
 static int tkey_test(void **state)
 {
+	/* pending */
 	struct dns_client_tkey_store *test_store;
 	const char *test_name = "TEST_TKEY";
-	/* pending */
+	
 	struct dns_client_tkey *nametest = test_tkey_name();
 	struct dns_client_tkey *verifier = dns_find_tkey(test_store, test_name);
 
-	if (nametest->name != test_name) {
+	if (nametest->name != verifier->name) {
 		return -1;
 	}
 
