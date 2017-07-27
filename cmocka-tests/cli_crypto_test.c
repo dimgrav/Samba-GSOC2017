@@ -39,8 +39,6 @@
 #include "auth/gensec/gensec.h"
 #include "libcli_crypto.h"
 
-/* test suite */
-
 static const struct dns_res_rec *test_record(TALLOC_CTX *mem_ctx) {
 
 	struct dns_res_rec *test_rec;
@@ -75,6 +73,8 @@ static const struct dns_client_tkey *test_tkey_name() {
 
 	return test_tkey;
 };
+
+/* test suite */
 
 /* 
  * calls fail() if assert_memory_equal() is false
