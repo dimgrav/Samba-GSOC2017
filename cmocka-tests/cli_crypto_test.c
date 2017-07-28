@@ -144,8 +144,8 @@ static int gen_tsig_test(void **state)
 	/* pending */
 
 	/* test for TSIG search in packet */
-	WERROR w_tsig_found;
-	dns_cli_generate_tsig();
+	WERROR w_tsig_found = dns_cli_generate_tsig(test_client, mem_ctx,
+									test_state, test_packet, in_test);
 	if (w_tsig_found != WERR_OK)
 	{
 		/* code */
