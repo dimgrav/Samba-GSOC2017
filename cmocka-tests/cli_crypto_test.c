@@ -66,7 +66,7 @@ static const struct dns_res_rec *test_record(TALLOC_CTX *mem_ctx) {
 	return test_rec;
 };
 
-static const struct dns_client_tkey *test_tkey_name() {
+static const struct dns_client_tkey *test_tkey_name(void) {
 	
 	struct dns_client_tkey *test_tkey = NULL;
 	test_tkey->name = "TEST_TKEY";
@@ -79,9 +79,9 @@ static const struct dns_client_tkey *test_tkey_name() {
 /* 
  * calls fail() if assert_memory_equal() is false
  * error codes
- *  0 : test completed succesfully
+ *  0 : (success) test passed
  * -1 : record inconsistent/not null
- * -2 : wrong WERROR output
+ * -2 : unexpected WERROR output
  */
 static int empty_sig_test(void **state)
 {
@@ -96,8 +96,9 @@ static int empty_sig_test(void **state)
 		return -1;
 	}
 	
+	/* check WERROR output */
 	werror = dns_empty_tsig(mem_ctx, orig_record, empty_record);
-	if (werror != WERR_OK) {
+	if (werror != WERR_OK || werror != WERR_NOT_ENOUGH_MEMORY) {
 		return -2;
 	}
 
@@ -108,8 +109,8 @@ static int empty_sig_test(void **state)
 
 /* 
  * error codes
- *  0 :	success: tkey name found in record and returned
- * -1 :	failure: tkey name not found
+ *  0 : (success) tkey name found in record and returned
+ * -1 :	tkey name not found
  */
 static int tkey_test(void **state)
 {
@@ -124,13 +125,16 @@ static int tkey_test(void **state)
 		return -1;
 	}
 
+	TALLOC_FREE(testing);
+	TALLOC_FREE(verifier);
 	return 0;
 }
 
 /* 
  * error codes
- *  0 -	success: packet signed with MAC and rebuilt
- * -1 -	failure: failed to rebuild packet
+ *  0 :	(success) packet signed with MAC and rebuilt
+ * -1 :	unexpected WERROR output
+ * -2 : unexpected DNS_ERR output
  */
 static int gen_tsig_test(void **state)
 {
@@ -141,17 +145,18 @@ static int gen_tsig_test(void **state)
 	struct dns_request_state *test_state;
 	struct dns_name_packet *test_packet;
 
-	/* pending */
-
-	/* test for TSIG search in packet */
-	WERROR w_tsig_found = dns_cli_generate_tsig(test_client, mem_ctx,
+	/* test error codes */
+	WERROR test_gen = dns_cli_generate_tsig(test_client, mem_ctx,
 									test_state, test_packet, in_test);
-	if (w_tsig_found != WERR_OK)
-	{
+	
+	if (test_gen != WERR_OK || test_gen != WERR_NOT_ENOUGH_MEMORY) {
 		/* code */
 		return -1;
+	} else if (test_gen != DNS_ERR(FORMAT_ERROR) || test_gen != DNS_ERR(NOTAUTH)) {
+		/* code */
+		return -2;
 	}
-	
+
 	return 0;
 }
 
