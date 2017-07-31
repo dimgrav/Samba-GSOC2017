@@ -44,7 +44,7 @@ struct dns_client {
 	struct ldb_context *samdb;
 	struct dns_client_zone *zones;
 	struct dns_client_tkey_store *tkeys;
-	struct cli_credentials *server_credentials;
+	struct cli_credentials *client_credentials;
 	uint16_t max_payload;
 };
 
