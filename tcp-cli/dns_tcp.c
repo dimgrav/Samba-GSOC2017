@@ -194,7 +194,7 @@ static void dns_tcp_req_done(struct tevent_req *subreq)
 	if (!W_ERROR_IS_OK(err)) {
 		DEBUG(1, ("dns_process error: %s\n", win_errstr(err)));
 		dns_tcp_terminate_connection(dns_conn,
-		"dns_tcp_req_recv_reply: dns process recv failure!");
+		"dns_tcp_req_done: dns process recv failure!");
 		return;
 	}
 
