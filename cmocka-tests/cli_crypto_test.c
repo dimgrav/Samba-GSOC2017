@@ -78,7 +78,7 @@ static const struct dns_client_tkey *test_tkey_name(void) {
 
 /* 
  * calls fail() if assert_memory_equal() is false
- * error codes
+ * return codes
  *  0 : (success) test passed
  * -1 : record inconsistent/not null
  * -2 : unexpected WERROR output
@@ -86,20 +86,26 @@ static const struct dns_client_tkey *test_tkey_name(void) {
 static int empty_sig_test(void **state)
 {
 	/* pending */
+	int err;
 	WERROR werror;
 	struct dns_res_rec *orig_record = test_record(mem_ctx);
 	struct dns_res_rec *empty_record = NULL;
 	assert_memory_equal(orig_record, empty_record, sizeof(dns_res_rec));
 
+	/* are fprintf redundant? */
 	/* this should work for checking the entire tsig rdata field */
 	if (empty_record->rdata.tsig_record != NULL) {
-		return -1;
+		err = -1;
+		fprintf(stderr, "TSIG consistency error: %s\n", strerror(err));
+		return err;
 	}
 	
 	/* check WERROR output */
 	werror = dns_empty_tsig(mem_ctx, orig_record, empty_record);
 	if (werror != WERR_OK || werror != WERR_NOT_ENOUGH_MEMORY) {
-		return -2;
+		err = -2;
+		fprintf(stderr, "Unexpected WERROR: %s\n", strerror(err));
+		return err;
 	}
 
 	TALLOC_FREE(orig_record);
@@ -108,13 +114,14 @@ static int empty_sig_test(void **state)
 }
 
 /* 
- * error codes
+ * return codes
  *  0 : (success) tkey name found in record and returned
  * -1 :	tkey name not found
  */
 static int tkey_test(void **state)
 {
 	/* pending */
+	int err;
 	struct dns_client_tkey_store *test_store;
 	const char *test_name = "TEST_TKEY";
 	
@@ -122,7 +129,9 @@ static int tkey_test(void **state)
 	struct dns_client_tkey *verifier = dns_find_tkey(test_store, test_name);
 
 	if (testing->name != verifier->name) {
-		return -1;
+		err = -1;
+		fprintf(stderr, "tkey_name not found: %s\n", strerror(err));
+		return err;
 	}
 
 	TALLOC_FREE(testing);
@@ -131,10 +140,11 @@ static int tkey_test(void **state)
 }
 
 /* 
- * error codes
+ * return codes
  *  0 :	(success) packet signed with MAC and rebuilt
- * -1 :	unexpected WERROR output
- * -2 : unexpected DNS_ERR output
+ * -1 :	WERROR output (NOMEM)
+ * -2 : DNS_ERR output
+ * -3 : unexpected output
  */
 static int gen_tsig_test(void **state)
 {
@@ -146,18 +156,29 @@ static int gen_tsig_test(void **state)
 	struct dns_name_packet *test_packet;
 
 	/* test error codes */
-	WERROR test_gen = dns_cli_generate_tsig(test_client, mem_ctx,
+	WERROR test_err = dns_cli_generate_tsig(test_client, mem_ctx,
 									test_state, test_packet, in_test);
-	
-	if (test_gen != WERR_OK || test_gen != WERR_NOT_ENOUGH_MEMORY) {
-		/* code */
-		return -1;
-	} else if (test_gen != DNS_ERR(FORMAT_ERROR) || test_gen != DNS_ERR(NOTAUTH)) {
-		/* code */
-		return -2;
-	}
 
-	return 0;
+	int err;
+	switch (test_err) {
+		case WERR_OK:
+			return 0;
+		case WERR_NOT_ENOUGH_MEMORY:
+			err = -1;
+			fprintf(stderr, "WERR_NOMEM: %s\n", strerror(err));
+			return err;
+		case DNS_ERR(FORMAT_ERROR):
+		case DNS_ERR(NOTAUTH):
+			err = -2;
+			fprintf(stderr, "DNS_ERR: %s\n", strerror(err));
+			return err;
+		default:
+			err = -3;
+			fprintf(stderr, "Unexpected ERROR: %s\n", strerror(err));
+			return err;
+	};
+
+	TALLOC_FREE(mem_ctx);
 }
 
 /* run test suite */
