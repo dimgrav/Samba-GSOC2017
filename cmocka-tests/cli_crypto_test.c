@@ -46,13 +46,13 @@ static const struct dns_res_rec *test_record(TALLOC_CTX *mem_ctx) {
 	 * is there something more apropriate in talloc for
 	 * assigning a specific string as a dns_res_rec->name?
 	 */
-	test_rec->name = talloc_set_name_const(mem_ctx, "TEST_RECORD");
+	test_rec->name = "TEST_RECORD";
 	test_rec->rr_type = DNS_QTYPE_TSIG;
 	test_rec->rr_class = DNS_QCLASS_ANY;
 	test_rec->ttl = 0;
 	test_rec->length = UINT16_MAX;
 	/* rdata */
-	test_rec->rdata.tsig_record.algorithm_name = talloc_set_name_const(mem_ctx, "ALG_NAME");
+	test_rec->rdata.tsig_record.algorithm_name = "ALG_NAME";
 	test_rec->rdata.tsig_record.time_prefix = 0;
 	test_rec->rdata.tsig_record.time = current_time;
 	test_rec->rdata.tsig_record.fudge = 300;
