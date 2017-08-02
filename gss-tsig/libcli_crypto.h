@@ -27,6 +27,8 @@
 #include "librpc/gen_ndr/dns.h"
 #include "librpc/gen_ndr/ndr_dnsp.h"
 
+/* trying to wrap signature generation here, could use some help */
+
 /* error handling */
 uint8_t werr_to_dns_err(WERROR werr);
 #define DNS_ERR(err_str) WERR_DNS_ERROR_RCODE_##err_str
@@ -40,7 +42,6 @@ struct dns_client_zone {
 };
 
 struct dns_client {
-	struct task_server *task;
 	struct ldb_context *samdb;
 	struct dns_client_zone *zones;
 	struct dns_client_tkey_store *tkeys;
@@ -92,5 +93,7 @@ WERROR dns_cli_generate_sig(struct dns_client *dns,
 		       struct dns_name_packet *packet,
 		       struct dns_request_state *state,
 		       DATA_BLOB *in);
+
+typedef typeof(dns_cli_generate_sig) dns_cli_generate_sig_w;
 
 #endif /* __DNS_CLIENT_H__ */
