@@ -43,8 +43,7 @@ static const struct dns_res_rec *test_record(TALLOC_CTX *mem_ctx) {
 
 	struct dns_res_rec *test_rec;
 	/* unsure about talloc_set_name_const() here
-	 * is there something more apropriate in talloc for
-	 * assigning a specific string as a dns_res_rec->name?
+	 * dns_string is defined as const char *, so I used strings
 	 */
 	test_rec->name = "TEST_RECORD";
 	test_rec->rr_type = DNS_QTYPE_TSIG;

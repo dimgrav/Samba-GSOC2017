@@ -45,52 +45,67 @@
 #define DNS_REQUEST_TIMEOUT 2
 
 /* 
- * error codes
- *  0 -	success
- * -1 -	failure
+ * return codes
+ *  0 :	success
+ * -1 :	failure
  */
-static int test_req_send(TALLOC_CTX *mem_ctx,
-					struct tevent_context *ev,
-					const char *server_addr_string,
-					struct iovec *vector,
-					size_t count)
+static int test_req_send(void **state)
+{
+	/* incomplete */
+	TALLOC_CTX *mem_ctx;
+	struct tevent_context *test_ev;
+	const char *test_server_addr_string;
+	struct iovec *test_vector;
+	size_t test_count;
+
+	/* pending */
+	return 0;
+}
+
+/* 
+ * return codes
+ *  0 :	success
+ * -1 :	failure
+ */
+static int test_req_recv_reply(void **state)
 {
 	/* pending */
 	return 0;
 }
 
 /* 
- * error codes
- *  0 -	success
- * -1 -	failure
+ * return codes
+ *  0 :	success
+ * -1 :	failure
  */
-static int test_req_recv_reply(struct tevent_req *subreq)
+static int test_req_done(void **state)
 {
 	/* pending */
 	return 0;
 }
 
 /* 
- * error codes
- *  0 -	success
- * -1 -	failure
+ * return codes
+ *  0 :	(success) request received
+ * -1 :	failed to receive request
  */
-static int test_req_done(struct tevent_req *subreq)
+static int test_req_recv(void **state)
 {
-	/* pending */
-	return 0;
-}
+	/* incomplete */
+	struct tevent_req *test_req;
+	TALLOC_CTX *mem_ctx;
+	uint8_t **test_reply;
+	size_t *test_reply_len;
 
-/* 
- * error codes
- *  0 -	success
- * -1 -	failure
- */
-static int test_req_recv(struct tevent_req *req,
-			 		TALLOC_CTX *mem_ctx,
-			 		uint8_t **reply,
-			 		size_t *reply_len)
-{
 	/* pending */
-	return 0;
+	int test_rcv = dns_tcp_req_recv(test_req, mem_ctx, test_reply, test_reply_len);
+	int err;
+
+	if (test_rcv == 0) {
+		return 0;
+	} else {
+		err = -1;
+		fprintf(stderr, "Unexpected failure: %s\n", strerror(err));
+		return err;
+	};
 }
