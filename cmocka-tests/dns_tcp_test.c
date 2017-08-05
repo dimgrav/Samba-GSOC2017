@@ -8,17 +8,18 @@
  * Copyright 2013 (c) Andreas Schneider <asn@cynapses.org>
  *                    Jakub Hrozek <jakub.hrozek@gmail.com>
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <errno.h>
@@ -46,20 +47,32 @@
 
 /* 
  * return codes
- *  0 :	success
- * -1 :	failure
+ *  0 :	(success) async request sent
+ * -1 :	failed to create request
  */
 static int test_req_send(void **state)
 {
 	/* incomplete */
 	TALLOC_CTX *mem_ctx;
 	struct tevent_context *test_ev;
-	const char *test_server_addr_string;
+	const char *test_server_addr_string = "TEST_SRVR_ADDR";
 	struct iovec *test_vector;
 	size_t test_count;
 
+	struct tevent_req *test_req = dns_tcp_req_send(mem_ctx, test_ev,
+											test_server_addr_string, 
+											test_vector, test_count);
+
 	/* pending */
-	return 0;
+	int err;
+	/* switch statement used in case more checks need to be added */
+	switch (test_req) {
+		case NULL:
+			err = -1;
+			fprintf(stderr, "NULL async request: %s\n", strerror(err));
+		default:
+			return 0;
+	};
 }
 
 /* 
@@ -70,6 +83,8 @@ static int test_req_send(void **state)
 static int test_req_recv_reply(void **state)
 {
 	/* pending */
+	struct tevent_req *test_subreq;
+	dns_tcp_req_recv_reply(test_subreq);
 	return 0;
 }
 
@@ -86,7 +101,7 @@ static int test_req_done(void **state)
 
 /* 
  * return codes
- *  0 :	(success) request received
+ *  0 :	(success) async request received
  * -1 :	failed to receive request
  */
 static int test_req_recv(void **state)
@@ -94,8 +109,8 @@ static int test_req_recv(void **state)
 	/* incomplete */
 	struct tevent_req *test_req;
 	TALLOC_CTX *mem_ctx;
-	uint8_t **test_reply;
-	size_t *test_reply_len;
+	uint8_t **test_reply = UINT8_MAX;
+	size_t *test_reply_len = SIZE_MAX;
 
 	/* pending */
 	int test_rcv = dns_tcp_req_recv(test_req, mem_ctx, test_reply, test_reply_len);
