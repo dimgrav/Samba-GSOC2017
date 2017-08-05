@@ -70,6 +70,7 @@ static int test_req_send(void **state)
 		case NULL:
 			err = -1;
 			fprintf(stderr, "NULL async request: %s\n", strerror(err));
+			return err;
 		default:
 			return 0;
 	};
