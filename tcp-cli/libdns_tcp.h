@@ -59,14 +59,18 @@ struct dns_tcp_call {
 	struct iovec out_iov[2];
 };
 
-/* dns tcp request buffer */
+/* dns tcp request buffer 
+ * see libcli/dns/libdns.h for parameters
+ */
 struct tevent_req *dns_tcp_req_send(TALLOC_CTX *mem_ctx,
 					struct tevent_context *ev,
 					const char *server_addr_string,
 					struct iovec *vector,
 					size_t count);
 
-/* dns tcp response */
+/* dns tcp response
+ * see libcli/dns/libdns.h for parameters
+ */
 int dns_tcp_req_recv(struct tevent_req *req,
 			 TALLOC_CTX *mem_ctx,
 			 uint8_t **reply,
