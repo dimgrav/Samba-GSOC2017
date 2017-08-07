@@ -57,25 +57,6 @@ static WERROR dns_empty_tsig(TALLOC_CTX *mem_ctx,
 	W_ERROR_HAVE_NO_MEMORY(empty_record->rdata.tsig_record.algorithm_name);
 	ZERO_STRUCT(empty_record->rdata.tsig_record);
 
-	/* 
-	---the long way---
-	empty_record->rdata.tsig_record.algorithm_name = talloc_memdup(mem_ctx, 
-							orig_record->rdata.tsig_record.algorithm_name, 0);
-	memset(empty_record->rdata.tsig_record.time_prefix, 0, sizeof(uint16_t));
-	memset(empty_record->rdata.tsig_record.time, 0, sizeof(uint32_t));
-	memset(empty_record->rdata.tsig_record.fudge, 0, sizeof(uint16_t));
-	memset(empty_record->rdata.tsig_record.mac_size, 0, sizeof(uint16_t));
-	empty_record->rdata.tsig_record.mac = talloc_memdup(mem_ctx,
-							orig_record->rdata.tsig_record.mac,
-							empty_record->rdata.tsig_record.mac_size);
-	memset(empty_record->rdata.tsig_record.original_id, 0, sizeof(uint16_t));
-	memset(empty_record->rdata.tsig_record.error, 0, sizeof(uint16_t));
-	memset(empty_record->rdata.tsig_record.other_size, 0, sizeof(uint16_t));
-	empty_record->rdata.tsig_record.other_data = talloc_memdup(mem_ctx,
-							orig_record->rdata.tsig_record.other_data,
-							empty_record->rdata.tsig_record.other_size);
-	*/
-
 	return WERR_OK;
 }
 
