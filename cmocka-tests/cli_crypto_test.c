@@ -92,7 +92,6 @@ static int empty_sig_test(void **state)
 	struct dns_res_rec *empty_record = NULL;
 	assert_memory_equal(orig_record, empty_record, sizeof(dns_res_rec));
 
-	/* are fprintf redundant? */
 	/* this should work for checking the entire tsig rdata field */
 	if (empty_record->rdata.tsig_record != NULL) {
 		err = -1;
@@ -184,13 +183,13 @@ static int gen_tsig_test(void **state)
 /* run test suite */
 int main(void)
 {
-	/* test structure */
-	const struct CMUnitTest tests[] = {
+	/* tests structure */
+	const struct CMUnitTest crypto_tests[] = {
 		cmocka_unit_test(empty_sig_test);
 		cmocka_unit_test(tkey_test);
 		cmocka_unit_test(gen_tsig_test);	
 	};
 
 	cmocka_set_message_output(CM_OUTPUT_SUBUNIT);
-	return cmocka_run_group_tests(tests, NULL, NULL);
+	return cmocka_run_group_tests(crypto_tests, NULL, NULL);
 }
