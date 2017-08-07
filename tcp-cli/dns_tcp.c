@@ -211,9 +211,7 @@ int dns_tcp_req_recv(struct tevent_req *req,
 			struct dns_tcp_request_state);
 	int err;
 
-	/* tevent_req_is_unix_error does not appear to be defined in tevent
-	 * yet it is used by libcli/dns.c in udp requests!
-	 */
+	/* tevent_req_is_unix_defined in tevent_unix.h */
 	if (tevent_req_is_unix_error(req, &err)) {
 		tevent_req_received(req);
 		return err;
