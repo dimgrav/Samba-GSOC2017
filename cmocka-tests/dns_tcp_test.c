@@ -62,8 +62,7 @@ static int test_req_send(void **state)
 	size_t test_count = SIZE_MAX;
 
 	struct tevent_req *test_req = dns_tcp_req_send(mem_ctx, test_ev,
-											test_server_addr_string, 
-											test_vector, test_count);
+			test_server_addr_string, test_vector, test_count);
 
 	/* pending */
 	int err;
@@ -81,27 +80,29 @@ static int test_req_send(void **state)
 }
 
 /* 
- * return codes
- *  0 :	success
- * -1 :	failure
+ * calls fail() if test_subreq is NULL
+ * prints error message to stderr stream
  */
-static int test_req_recv_reply(void **state)
+static void test_req_recv_reply(void **state)
 {
 	/* pending */
 	struct tevent_req *test_subreq;
+	assert_non_null(test_subreq);
 	dns_tcp_req_recv_reply(test_subreq);
-	return 0;
+	return;
 }
 
 /* 
- * return codes
- *  0 :	success
- * -1 :	failure
+ * calls fail() if test_subreq is NULL
+ * prints error message to stderr stream
  */
-static int test_req_done(void **state)
+static void test_req_done(void **state)
 {
 	/* pending */
-	return 0;
+	struct tevent_req *test_subreq;
+	assert_non_null(test_subreq);
+	dns_tcp_req_done(test_subreq);
+	return;
 }
 
 /* 
