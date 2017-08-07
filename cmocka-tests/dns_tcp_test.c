@@ -45,6 +45,8 @@
 
 #define DNS_REQUEST_TIMEOUT 2
 
+/* test suite */
+
 /* 
  * return codes
  *  0 :	(success) async request sent
@@ -57,7 +59,7 @@ static int test_req_send(void **state)
 	struct tevent_context *test_ev;
 	const char *test_server_addr_string = "TEST_SRVR_ADDR";
 	struct iovec *test_vector;
-	size_t test_count;
+	size_t test_count = SIZE_MAX;
 
 	struct tevent_req *test_req = dns_tcp_req_send(mem_ctx, test_ev,
 											test_server_addr_string, 
@@ -74,6 +76,8 @@ static int test_req_send(void **state)
 		default:
 			return 0;
 	};
+
+	TALLOC_FREE(mem_ctx);
 }
 
 /* 
@@ -124,4 +128,21 @@ static int test_req_recv(void **state)
 		fprintf(stderr, "Unexpected failure: %s\n", strerror(err));
 		return err;
 	};
+
+	TALLOC_FREE(mem_ctx);
+}
+
+/* run test suite */
+int main(void)
+{
+	/* tests structure */
+	const struct CMUnitTest tcp_tests[] = {
+		cmocka_unit_test(test_req_send);
+		cmocka_unit_test(test_req_recv_reply);
+		cmocka_unit_test(test_req_done);
+		cmocka_unit_test(test_req_recv);
+	};
+
+	cmocka_set_message_output(CM_OUTPUT_SUBUNIT);
+	return cmocka_run_group_tests(tcp_tests, NULL, NULL);
 }
