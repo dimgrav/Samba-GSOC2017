@@ -94,6 +94,4 @@ WERROR dns_cli_generate_sig(struct dns_client *dns,
 		       struct dns_request_state *state,
 		       DATA_BLOB *in);
 
-typedef typeof(dns_cli_generate_sig) dns_cli_generate_sig_w;
-
 #endif /* __DNS_CLIENT_H__ */
