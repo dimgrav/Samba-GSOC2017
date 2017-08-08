@@ -41,18 +41,14 @@
 #include "wrap_dns_tcp.h"
 
 /* wrap dns_cli_send/recv() and tsig generation functions */
-
-/* should probably cast to struct */
-int __wrap_tcp_req_send(TALLOC_CTX *mem_ctx, struct tevent_context *ev,
+tevent_req *__wrap_tcp_req_send(TALLOC_CTX *mem_ctx, struct tevent_context *ev,
 					const char *server_addr_string, struct iovec *vector, size_t count)
 {
-	struct tevent_req *dns_tcp_req_send(TALLOC_CTX *mem_ctx,
+	return dns_tcp_req_send(TALLOC_CTX *mem_ctx,
 					struct tevent_context *ev,
 					const char *server_addr_string,
 					struct iovec *vector,
 					size_t count);
-
-	return 0;
 }
 
 int __wrap_tcp_req_recv(struct tevent_req *subreq, struct tevent_req *req,
