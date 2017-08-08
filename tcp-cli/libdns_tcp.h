@@ -76,4 +76,12 @@ int dns_tcp_req_recv(struct tevent_req *req,
 			 uint8_t **reply,
 			 size_t *reply_len);
 
+/* callbacks */
+void dns_tcp_req_recv_reply(struct tevent_req *subreq);
+void dns_tcp_req_done(struct tevent_req *subreq);
+
+/* terminate connection */
+void dns_tcp_terminate_connection(struct dns_tcp_connection *dnsconn, 
+					const char *reason);
+
 #endif /*__LIBTCP_H__*/
