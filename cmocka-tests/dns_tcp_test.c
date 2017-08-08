@@ -45,7 +45,7 @@
 
 #define DNS_REQUEST_TIMEOUT 2
 
-/* test suite */
+/* test suite --- INCOMPLETE --- */
 
 /* 
  * return codes

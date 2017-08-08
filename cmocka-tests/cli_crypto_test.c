@@ -32,7 +32,7 @@
 #include <setjmp.h>
 #include <cmocka.h>
 
-#include "source4/include/includes.h"
+#include "includes.h"
 #include "lib/crypto/hmacmd5.h"
 #include "system/network.h"
 #include "libcli/util/ntstatus.h"
