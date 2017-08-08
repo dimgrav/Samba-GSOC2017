@@ -1,4 +1,4 @@
-/* DNS TCP send/recv wrapping with TSIG generation.
+/* DNS TCP send/recv wrap library with TSIG generation.
  *
  * --WORK IN PROGRESS--
  *
@@ -29,40 +29,14 @@
 
 /* to hide parameter types, to I have to define them all separately? */
 int __wrap_tcp_req_send(TALLOC_CTX *mem_ctx, struct tevent_context *ev,
-					const char *server_addr_string, struct iovec *vector, size_t count)
-{
-	dns_tcp_req_send(TALLOC_CTX *mem_ctx,
-					struct tevent_context *ev,
-					const char *server_addr_string,
-					struct iovec *vector,
-					size_t count);
-}
+					const char *server_addr_string, struct iovec *vector, size_t count);
 
 int __wrap_tcp_req_recv(struct tevent_req *subreq, struct tevent_req *req,
-			 		TALLOC_CTX *mem_ctx, uint8_t **reply, size_t *reply_len)
-{
-	dns_tcp_req_recv_reply(subreq);
+			 		TALLOC_CTX *mem_ctx, uint8_t **reply, size_t *reply_len);
 
-	dns_tcp_req_done(subreq);
-
-	dns_tcp_req_recv(struct tevent_req *req,
-			 		TALLOC_CTX *mem_ctx,
-			 		uint8_t **reply,
-			 		size_t *reply_len);
-}
-
-int __wrap_tcp_cli_tsig_gen(struct dns_client_tkey_store *store, const char *name,
+WERROR __wrap_tcp_cli_tsig_gen(struct dns_client_tkey_store *store, const char *name,
 					struct dns_client *dns, TALLOC_CTX *mem_ctx,
 		       		struct dns_request_state *state, struct dns_name_packet *packet,
-		        	DATA_BLOB *in)
-{
-	dns_find_tkey(struct dns_client_tkey_store *store, const char *name);
-
-	dns_cli_generate_tsig(struct dns_client *dns,
-		       		TALLOC_CTX *mem_ctx,
-		       		struct dns_request_state *state,
-		        	struct dns_name_packet *packet,
 		        	DATA_BLOB *in);
-}
 
 #endif /* __WRAP_DNS_TCP__ */
