@@ -38,7 +38,8 @@ int __wrap_tcp_req_send(TALLOC_CTX *mem_ctx, struct tevent_context *ev,
 					size_t count);
 }
 
-int __wrap_tcp_req_recv(struct tevent_req *subreq)
+int __wrap_tcp_req_recv(struct tevent_req *subreq, struct tevent_req *req,
+			 		TALLOC_CTX *mem_ctx, uint8_t **reply, size_t *reply_len)
 {
 	dns_tcp_req_recv_reply(subreq);
 
