@@ -77,7 +77,7 @@ static const struct dns_client_tkey *test_tkey_name(void) {
 /* test suite */
 
 /* 
- * calls fail() if assert_memory_equal() is false
+ * calls fail() if assertions are false
  * return codes
  *  0 : (success) test passed
  * -1 : record inconsistent/not null
@@ -90,6 +90,8 @@ static int empty_sig_test(void **state)
 	WERROR werror;
 	struct dns_res_rec *orig_record = test_record(mem_ctx);
 	struct dns_res_rec *empty_record = NULL;
+
+	assert_null(empty_record);
 	assert_memory_equal(orig_record, empty_record, sizeof(dns_res_rec));
 
 	/* this should work for checking the entire tsig rdata field */
@@ -113,6 +115,7 @@ static int empty_sig_test(void **state)
 }
 
 /* 
+ * calls fail() if assertions are false
  * return codes
  *  0 : (success) tkey name found in record and returned
  * -1 :	tkey name not found
@@ -126,6 +129,10 @@ static int tkey_test(void **state)
 	
 	struct dns_client_tkey *testing = test_tkey_name();
 	struct dns_client_tkey *verifier = dns_find_tkey(test_store, test_name);
+
+	assert_non_null(testing);
+	assert_non_null(verifier);
+	assert_memory_equal(testing, verifier, sizeof(dns_client_tkey));
 
 	if (testing->name != verifier->name) {
 		err = -1;
