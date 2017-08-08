@@ -29,27 +29,16 @@
 
 /* to hide parameter types, to I have to define them all separately? */
 int __wrap_tcp_req_send(TALLOC_CTX *mem_ctx, struct tevent_context *ev,
-					const char *server_addr_string, struct iovec *vector, size_t count, 
-					struct dns_client_tkey_store *store, const char *name, 
-					struct dns_client *dns, struct dns_request_state *state,
-		        	struct dns_name_packet *packet, DATA_BLOB *in)
+					const char *server_addr_string, struct iovec *vector, size_t count)
 {
 	dns_tcp_req_send(TALLOC_CTX *mem_ctx,
 					struct tevent_context *ev,
 					const char *server_addr_string,
 					struct iovec *vector,
 					size_t count);
-
-	dns_find_tkey(struct dns_client_tkey_store *store, const char *name);
-
-	dns_cli_generate_tsig(struct dns_client *dns,
-		       		TALLOC_CTX *mem_ctx,
-		       		struct dns_request_state *state,
-		        	struct dns_name_packet *packet,
-		        	DATA_BLOB *in);
 }
 
-int _wrap_tcp_req_recv(struct tevent_req *subreq)
+int __wrap_tcp_req_recv(struct tevent_req *subreq)
 {
 	dns_tcp_req_recv_reply(subreq);
 
@@ -58,7 +47,21 @@ int _wrap_tcp_req_recv(struct tevent_req *subreq)
 	dns_tcp_req_recv(struct tevent_req *req,
 			 		TALLOC_CTX *mem_ctx,
 			 		uint8_t **reply,
-			 		size_t *reply_len)
+			 		size_t *reply_len);
+}
+
+int __wrap_tcp_cli_tsig_gen(struct dns_client_tkey_store *store, const char *name,
+					struct dns_client *dns, TALLOC_CTX *mem_ctx,
+		       		struct dns_request_state *state, struct dns_name_packet *packet,
+		        	DATA_BLOB *in)
+{
+	dns_find_tkey(struct dns_client_tkey_store *store, const char *name);
+
+	dns_cli_generate_tsig(struct dns_client *dns,
+		       		TALLOC_CTX *mem_ctx,
+		       		struct dns_request_state *state,
+		        	struct dns_name_packet *packet,
+		        	DATA_BLOB *in);
 }
 
 #endif /* __WRAP_DNS_TCP__ */
