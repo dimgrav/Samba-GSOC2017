@@ -1,4 +1,4 @@
-/* DNS TCP send/recv wrapping with TSIG generation.
+/* DNS UDP/TCP send/recv wrapping with TSIG generation.
  *
  * --WORK IN PROGRESS--
  *
@@ -38,9 +38,33 @@
 #include "auth/auth.h"
 #include "auth/gensec/gensec.h"
 #include "gss-tsig/libtsig.h"
-#include "wrap_dns_tcp.h"
+#include "libwrap.h"
 
-/* wrap dns_cli_send/recv() and tsig generation functions */
+/* wrap dns udp/tcp req send/recv() and tsig generation functions */
+
+/* udp */
+tevent_req *__wrap_udp_req_send(TALLOC_CTX *mem_ctx, struct tevent_context *ev,
+					const char *server_addr_string, const uint8_t *query, size_t query_len)
+{
+	return dns_udp_request_send(TALLOC_CTX *mem_ctx,
+					struct tevent_context *ev,
+					const char *server_addr_string,
+					const uint8_t *query,
+					size_t query_len);
+}
+
+int __wrap_udp_req_recv(struct tevent_req *subreq, struct tevent_req *req,
+			 		TALLOC_CTX *mem_ctx, uint8_t **reply, size_t *reply_len)
+{
+	void dns_udp_request_get_reply(tevent_req *subreq);
+
+	void dns_udp_request_done(tevent_req *subreq);
+
+	return dns_udp_request_recv(struct tevent_req *req, TALLOC_CTX *mem_ctx,
+				uint8_t **reply, size_t *reply_len);
+}
+
+/* tcp */
 tevent_req *__wrap_tcp_req_send(TALLOC_CTX *mem_ctx, struct tevent_context *ev,
 					const char *server_addr_string, struct iovec *vector, size_t count)
 {
@@ -62,6 +86,7 @@ int __wrap_tcp_req_recv(struct tevent_req *subreq, struct tevent_req *req,
 				uint8_t **reply, size_t *reply_len);
 }
 
+/* tsig gen */
 WERROR __wrap_tcp_cli_tsig_gen(struct dns_client_tkey_store *store, const char *name,
 					struct dns_client *dns, TALLOC_CTX *mem_ctx,
 		       		struct dns_request_state *state, struct dns_name_packet *packet,

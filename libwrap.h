@@ -1,4 +1,4 @@
-/* DNS TCP send/recv wrap library with TSIG generation.
+/* DNS UDP/TCP send/recv wrap library with TSIG generation.
  *
  * --WORK IN PROGRESS--
  *
@@ -21,22 +21,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __WRAP_DNS_TCP__
-#define __WRAP_DNS_TCP__
+#ifndef __LIBWRAP_H__
+#define __LIBWRAP_H__
 
 #include "tcp-cli/libtcp.h"
 #include "gss-tsig/libtsig.h"
+#include "libcli/dns/libdns.h"
 
-/* to hide parameter types, do I have to define them all separately? */
+/* udp */
+tevent_req *__wrap_udp_req_send(TALLOC_CTX *mem_ctx, struct tevent_context *ev,
+					const char *server_addr_string, const uint8_t *query, size_t query_len);
+
+int __wrap_udp_req_recv(struct tevent_req *req, TALLOC_CTX *mem_ctx,
+			 		uint8_t **reply, size_t *reply_len);
+
+/* tcp */
 tevent_req *__wrap_tcp_req_send(TALLOC_CTX *mem_ctx, struct tevent_context *ev,
 					const char *server_addr_string, struct iovec *vector, size_t count);
 
 int __wrap_tcp_req_recv(struct tevent_req *subreq, struct tevent_req *req,
 			 		TALLOC_CTX *mem_ctx, uint8_t **reply, size_t *reply_len);
 
+/* tsig gen */
 WERROR __wrap_tcp_cli_tsig_gen(struct dns_client_tkey_store *store, const char *name,
 					struct dns_client *dns, TALLOC_CTX *mem_ctx,
 		       		struct dns_request_state *state, struct dns_name_packet *packet,
 		        	DATA_BLOB *in);
 
-#endif /* __WRAP_DNS_TCP__ */
+#endif /* __LIBWRAP_H__ */
