@@ -97,7 +97,7 @@ static int empty_sig_test(void **state)
 	/* this should work for checking the entire tsig rdata field */
 	if (empty_record->rdata.tsig_record != NULL) {
 		err = -1;
-		fprintf(stderr, "TSIG consistency error: %s\n", strerror(err));
+		fprintf(stderr, "sig_test TSIG consistency error: %s\n", strerror(err));
 		return err;
 	}
 	
@@ -105,7 +105,7 @@ static int empty_sig_test(void **state)
 	werror = dns_empty_tsig(mem_ctx, orig_record, empty_record);
 	if (werror != WERR_OK || werror != WERR_NOT_ENOUGH_MEMORY) {
 		err = -2;
-		fprintf(stderr, "Unexpected WERROR: %s\n", strerror(err));
+		fprintf(stderr, "sig_test unexpected WERROR: %s\n", strerror(err));
 		return err;
 	}
 

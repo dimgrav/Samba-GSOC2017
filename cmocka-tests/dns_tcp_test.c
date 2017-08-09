@@ -45,7 +45,11 @@
 
 #define DNS_REQUEST_TIMEOUT 2
 
-/* test suite --- INCOMPLETE --- */
+/* test suite --- INCOMPLETE ---
+ * do I need to include all the headers used in dns_tcp? 
+ * the send/recv() loop should be tested, I'm having a tough time
+ * writing tests for void type functions that may need to be mocked
+ */
 
 /* 
  * return codes
@@ -126,7 +130,7 @@ static int test_req_recv(void **state)
 		return 0;
 	} else {
 		err = -1;
-		fprintf(stderr, "Unexpected failure: %s\n", strerror(err));
+		fprintf(stderr, "Unexpected req recv failure: %s\n", strerror(err));
 		return err;
 	};
 
