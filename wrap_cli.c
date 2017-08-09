@@ -37,8 +37,8 @@
 #include "libcli/util/ntstatus.h"
 #include "auth/auth.h"
 #include "auth/gensec/gensec.h"
-#include "libcli_crypto.h"
-#include "wrap_dns_tcp.h"
+#include "libcli/dns/libcli_crypto.h"
+#include "libcli/dns/wrap_dns_tcp.h"
 
 /* wrap dns_cli_send/recv() and tsig generation functions */
 tevent_req *__wrap_tcp_req_send(TALLOC_CTX *mem_ctx, struct tevent_context *ev,
