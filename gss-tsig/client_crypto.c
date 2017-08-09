@@ -27,7 +27,7 @@
 #include "libcli/util/ntstatus.h"
 #include "auth/auth.h"
 #include "auth/gensec/gensec.h"
-#include "libcli_crypto.h"
+#include "libtsig.h"
 
 #undef DBGC_CLASS
 #define DBGC_CLASS DBGC_DNS

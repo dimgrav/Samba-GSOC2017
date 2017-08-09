@@ -21,8 +21,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __DNS_CLIENT_H__
-#define __DNS_CLIENT_H__
+#ifndef __LIBTSIG_H__
+#define __LIBTSIG_H__
 
 #include "librpc/gen_ndr/dns.h"
 #include "librpc/gen_ndr/ndr_dnsp.h"
@@ -94,4 +94,4 @@ WERROR dns_cli_generate_sig(struct dns_client *dns,
 		       struct dns_request_state *state,
 		       DATA_BLOB *in);
 
-#endif /* __DNS_CLIENT_H__ */
+#endif /* __LIBTSIG_H__ */
