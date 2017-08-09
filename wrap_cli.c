@@ -30,14 +30,14 @@
 #include "lib/util/samba_util.h"
 #include "libcli/util/error.h"
 #include "librpc/gen_ndr/dns.h"
-#include "libtcp/libtcp.h"
+#include "tcp-cli/libtcp.h"
 #include "includes.h"
 #include "lib/crypto/hmacmd5.h"
 #include "system/network.h"
 #include "libcli/util/ntstatus.h"
 #include "auth/auth.h"
 #include "auth/gensec/gensec.h"
-#include "gss-tsig/libcli_crypto.h"
+#include "gss-tsig/libtsig.h"
 #include "wrap_dns_tcp.h"
 
 /* wrap dns_cli_send/recv() and tsig generation functions */

@@ -24,8 +24,8 @@
 #ifndef __WRAP_DNS_TCP__
 #define __WRAP_DNS_TCP__
 
-#include "tcp-cli/libdns_tcp.h"
-#include "gss-tsig/libcli_crypto.h"
+#include "tcp-cli/libtcp.h"
+#include "gss-tsig/libtsig.h"
 
 /* to hide parameter types, do I have to define them all separately? */
 tevent_req *__wrap_tcp_req_send(TALLOC_CTX *mem_ctx, struct tevent_context *ev,
