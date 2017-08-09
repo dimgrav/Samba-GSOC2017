@@ -41,7 +41,7 @@
 #include "lib/util/samba_util.h"
 #include "libcli/util/error.h"
 #include "librpc/gen_ndr/dns.h"
-#include "libtcp/libtcp.h"
+#include "tcp-cli/libtcp.h"
 
 #define DNS_REQUEST_TIMEOUT 2
 
