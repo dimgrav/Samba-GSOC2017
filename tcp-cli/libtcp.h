@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2017 Dimitrios Gravanis
  * 
- * Based on the existing work onSamba Unix SMB/CIFS implementation by
+ * Based on the existing work on Samba Unix SMB/CIFS implementation by
  * Kai Blin Copyright (C) 2011, Stefan Metzmacher Copyright (C) 2014.
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -28,7 +28,7 @@
 #include "source4/dns_server/dnsserver_common.h"
 #include "lib/tsocket/tsocket.h"
 
-/** dns tcp definitions **/
+/** DNS TCP definitions **/
 struct tsocket_address;
 
 struct dns_socket {
@@ -59,8 +59,16 @@ struct dns_tcp_call {
 	struct iovec out_iov[2];
 };
 
-/* dns tcp request buffer 
- * see libcli/dns/libdns.h for parameters
+/** DNS TCP functions **/
+
+/* Send an DNS request to a DNS server via TCP
+ *
+ *@param mem_ctx        	talloc memory context to use
+ *@param ev             	tevent context to use
+ *@param server_addr_string address of the server as a string
+ *@param query          	dns query to send
+ *@param count 				length of the iovector
+ *@return tevent_req with the active request or NULL on out-of-memory
  */
 struct tevent_req *dns_tcp_req_send(TALLOC_CTX *mem_ctx,
 					struct tevent_context *ev,
@@ -68,20 +76,30 @@ struct tevent_req *dns_tcp_req_send(TALLOC_CTX *mem_ctx,
 					struct iovec *vector,
 					size_t count);
 
-/* dns tcp response
- * see libcli/dns/libdns.h for parameters
+/* Receive the DNS response from the DNS server via TCP
+ *
+ *@param req       tevent_req struct returned from dns_request_send
+ *@param mem_ctx   talloc memory context to use for the reply string
+ *@param reply     buffer that will be allocated and filled with the dns reply
+ *@param reply_len length of the reply buffer
+ *@return 0/errno
  */
 int dns_tcp_req_recv(struct tevent_req *req,
 			 TALLOC_CTX *mem_ctx,
 			 uint8_t **reply,
 			 size_t *reply_len);
 
-/* callbacks */
+/* Callbacks */
 void dns_tcp_req_recv_reply(struct tevent_req *subreq);
 void dns_tcp_req_done(struct tevent_req *subreq);
 
-/* terminate connection */
-void dns_tcp_terminate_connection(struct dns_tcp_connection *dnsconn, 
+/* Terminate connection 
+ * 
+ * @param dns_conn current DNS TCP connection	
+ * @param reason   reason of termination
+ * @return void
+ */
+void dns_tcp_terminate_connection(struct dns_tcp_connection *dns_conn, 
 					const char *reason);
 
 #endif /*__LIBTCP_H__*/
