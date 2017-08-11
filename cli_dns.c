@@ -44,6 +44,7 @@
 #include "auth/auth.h"
 #include "auth/gensec/gensec.h"
 #include "libcli/dns/libtsig.h"
+#include <string.h>
 
 #undef DBGC_CLASS
 #define DBGC_CLASS DBGC_DNS
@@ -489,7 +490,7 @@ static WERROR dns_cli_generate_tsig(struct dns_client *dns,
 	}
 	
 	memcpy(buffer, in->data, packet_len);
-	memcpy(buffer, fake_tsig_blob.data, fake_tsig_blob.length);
+	memcpy(buffer + packet_len, fake_tsig_blob.data, fake_tsig_blob.length);
 
 	/* generate signature */
 	gen_sig = gensec_sign_packet(tkey->gensec, mem_ctx, buffer, buffer_len,

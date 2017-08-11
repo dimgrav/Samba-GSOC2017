@@ -38,6 +38,7 @@
 #include "auth/auth.h"
 #include "auth/gensec/gensec.h"
 #include "gss-tsig/libtsig.h"
+#include <string.h>
 #include "libwrap.h"
 
 /* wrap dns udp/tcp req send/recv() and tsig generation functions */

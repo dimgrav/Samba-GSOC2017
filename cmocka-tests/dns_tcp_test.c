@@ -74,7 +74,7 @@ static int test_req_send(void **state)
 	switch (test_req) {
 		case NULL:
 			err = -1;
-			fprintf(stderr, "NULL async request: %s\n", strerror(err));
+			fprintf(stderr, "NULL async TCP request: %s\n", strerror(err));
 			return err;
 		default:
 			return 0;
@@ -130,7 +130,7 @@ static int test_req_recv(void **state)
 		return 0;
 	} else {
 		err = -1;
-		fprintf(stderr, "Unexpected req recv failure: %s\n", strerror(err));
+		fprintf(stderr, "Unexpected TCP req recv failure: %s\n", strerror(err));
 		return err;
 	};
 

@@ -39,6 +39,7 @@
 #include "auth/auth.h"
 #include "auth/gensec/gensec.h"
 #include "gss-tsig/libtsig.h"
+#include <string.h>
 
 static const struct dns_res_rec *test_record(TALLOC_CTX *mem_ctx) {
 
