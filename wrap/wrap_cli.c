@@ -22,7 +22,7 @@
  */
 
 #include <tevent.h>
-#include "replace.h"
+#include "lib/replace/replace.h"
 #include "system/network.h"
 #include "lib/tsocket/tsocket.h"
 #include "libcli/dns/libdns.h"
@@ -31,7 +31,7 @@
 #include "libcli/util/error.h"
 #include "librpc/gen_ndr/dns.h"
 #include "tcp-cli/libtcp.h"
-#include "includes.h"
+#include "source4/include/includes.h"
 #include "lib/crypto/hmacmd5.h"
 #include "system/network.h"
 #include "libcli/util/ntstatus.h"

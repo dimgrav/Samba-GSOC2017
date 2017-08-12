@@ -32,7 +32,7 @@
 #include <setjmp.h>
 #include <cmocka.h>
 
-#include "replace.h"
+#include "lib/replace/replace.h"
 #include "system/network.h"
 #include <tevent.h>
 #include "lib/tsocket/tsocket.h"

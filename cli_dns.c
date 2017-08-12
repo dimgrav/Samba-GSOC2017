@@ -24,7 +24,7 @@
 */
 
 /* DNS call send/recv() */
-#include "replace.h"
+#include "lib/replace/replace.h"
 #include "system/network.h"
 #include <tevent.h>
 #include "lib/tsocket/tsocket.h"
@@ -38,7 +38,7 @@
 #define DNS_REQUEST_TIMEOUT 2
 
 /* TSIG generation */
-#include "includes.h"
+#include "source4/include/includes.h"
 #include "lib/crypto/hmacmd5.h"
 #include "libcli/util/ntstatus.h"
 #include "auth/auth.h"
