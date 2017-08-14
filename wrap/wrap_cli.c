@@ -21,27 +21,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <tevent.h>
-#include "lib/replace/replace.h"
-#include "system/network.h"
-#include "lib/tsocket/tsocket.h"
-#include "libcli/dns/libdns.h"
-#include "lib/util/tevent_unix.h"
-#include "lib/util/samba_util.h"
-#include "libcli/util/error.h"
-#include "librpc/gen_ndr/dns.h"
-#include "tcp-cli/libtcp.h"
-#include "source4/include/includes.h"
-#include "lib/crypto/hmacmd5.h"
-#include "system/network.h"
-#include "libcli/util/ntstatus.h"
-#include "auth/auth.h"
-#include "auth/gensec/gensec.h"
-#include "gss-tsig/libtsig.h"
-#include <string.h>
 #include "libwrap.h"
 
-/* wrap dns udp/tcp req send/recv() and tsig generation functions */
+/* wrap dns udp/tcp req send/recv() and tsig generation functions
+ * see libcli/dns/lib*.h for wrapped function declarations
+ */
 
 /* udp */
 tevent_req *__wrap_udp_req_send(TALLOC_CTX *mem_ctx, struct tevent_context *ev,

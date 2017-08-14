@@ -21,14 +21,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "source4/include/includes.h"
+#include "includes.h"
 #include "lib/crypto/hmacmd5.h"
 #include "system/network.h"
 #include "libcli/util/ntstatus.h"
 #include "auth/auth.h"
 #include "auth/gensec/gensec.h"
 #include "libtsig.h"
-#include <string.h>
 
 #undef DBGC_CLASS
 #define DBGC_CLASS DBGC_DNS

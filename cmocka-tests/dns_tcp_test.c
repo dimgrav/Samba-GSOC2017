@@ -31,17 +31,17 @@
 #include <stddef.h>
 #include <setjmp.h>
 #include <cmocka.h>
+#include "foo.c"
 
-#include "lib/replace/replace.h"
+#include "replace.h"
 #include "system/network.h"
 #include <tevent.h>
 #include "lib/tsocket/tsocket.h"
-#include "libcli/dns/libdns.h"
+#include "tcp-cli/libtcp.h"
 #include "lib/util/tevent_unix.h"
 #include "lib/util/samba_util.h"
 #include "libcli/util/error.h"
 #include "librpc/gen_ndr/dns.h"
-#include "tcp-cli/libtcp.h"
 
 #define DNS_REQUEST_TIMEOUT 2
 
@@ -53,8 +53,8 @@
 
 /* 
  * return codes
- *  0 :	(success) async request sent
- * -1 :	failed to create request
+ *  0 :	(success) async tcp request sent
+ * -1 :	failed to create tcp request
  */
 static int test_req_send(void **state)
 {
@@ -130,7 +130,7 @@ static int test_req_recv(void **state)
 		return 0;
 	} else {
 		err = -1;
-		fprintf(stderr, "Unexpected TCP req recv failure: %s\n", strerror(err));
+		fprintf(stderr, "Unexpected req recv failure: %s\n", strerror(err));
 		return err;
 	};
 

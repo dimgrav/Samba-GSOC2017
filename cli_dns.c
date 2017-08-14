@@ -24,7 +24,7 @@
 */
 
 /* DNS call send/recv() */
-#include "lib/replace/replace.h"
+#include "replace.h"
 #include "system/network.h"
 #include <tevent.h>
 #include "lib/tsocket/tsocket.h"
@@ -38,13 +38,12 @@
 #define DNS_REQUEST_TIMEOUT 2
 
 /* TSIG generation */
-#include "source4/include/includes.h"
+#include "includes.h"
 #include "lib/crypto/hmacmd5.h"
 #include "libcli/util/ntstatus.h"
 #include "auth/auth.h"
 #include "auth/gensec/gensec.h"
 #include "libcli/dns/libtsig.h"
-#include <string.h>
 
 #undef DBGC_CLASS
 #define DBGC_CLASS DBGC_DNS
@@ -209,10 +208,10 @@ static void dns_tcp_req_recv_reply(struct tevent_req *subreq);
 static void dns_tcp_req_done(struct tevent_req *subreq);
 
 /* terminate tcp conn with server */
-static void dns_tcp_terminate_connection(struct dns_tcp_connection *dnsconn,
+static void dns_tcp_terminate_connection(struct dns_tcp_connection *dns_conn,
 										const char *reason)
 {
-	stream_terminate_connection(dnsconn->conn, reason);
+	stream_terminate_connection(dns_conn->conn, reason);
 }
 
 /* tcp request to send */

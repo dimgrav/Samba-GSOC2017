@@ -21,11 +21,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "lib/replace/replace.h"
+#include "replace.h"
 #include "system/network.h"
 #include <tevent.h>
 #include "lib/tsocket/tsocket.h"
-#include "libcli/dns/libdns.h"
+#include "Samba-GSOC2017/libdns.h"
 #include "lib/util/tevent_unix.h"
 #include "lib/util/samba_util.h"
 #include "libcli/util/error.h"
@@ -39,10 +39,10 @@ static void dns_tcp_req_recv_reply(struct tevent_req *subreq);
 static void dns_tcp_req_done(struct tevent_req *subreq);
 
 /* terminate tcp conn with server */
-static void dns_tcp_terminate_connection(struct dns_tcp_connection *dnsconn,
+static void dns_tcp_terminate_connection(struct dns_tcp_connection *dns_conn,
 										const char *reason)
 {
-	stream_terminate_connection(dnsconn->conn, reason);
+	stream_terminate_connection(dns_conn->conn, reason);
 }
 
 /* tcp request to send */
@@ -211,7 +211,7 @@ int dns_tcp_req_recv(struct tevent_req *req,
 			struct dns_tcp_request_state);
 	int err;
 
-	/* tevent_req_is_unix_defined in tevent_unix.h */
+	/* tevent_req_is_unix_error defined in tevent_unix.h */
 	if (tevent_req_is_unix_error(req, &err)) {
 		tevent_req_received(req);
 		return err;

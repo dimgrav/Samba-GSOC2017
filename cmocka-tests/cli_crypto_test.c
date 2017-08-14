@@ -31,15 +31,15 @@
 #include <stddef.h>
 #include <setjmp.h>
 #include <cmocka.h>
+#include "foo.c"
 
-#include "source4/include/includes.h"
+#include "includes.h"
 #include "lib/crypto/hmacmd5.h"
 #include "system/network.h"
 #include "libcli/util/ntstatus.h"
 #include "auth/auth.h"
 #include "auth/gensec/gensec.h"
 #include "gss-tsig/libtsig.h"
-#include <string.h>
 
 static const struct dns_res_rec *test_record(TALLOC_CTX *mem_ctx) {
 
@@ -53,7 +53,7 @@ static const struct dns_res_rec *test_record(TALLOC_CTX *mem_ctx) {
 	test_rec->ttl = 0;
 	test_rec->length = UINT16_MAX;
 	/* rdata */
-	test_rec->rdata.tsig_record.algorithm_name = "ALG_NAME";
+	test_rec->rdata.tsig_record.algorithm_name = "gss-tsig";
 	test_rec->rdata.tsig_record.time_prefix = 0;
 	test_rec->rdata.tsig_record.time = current_time;
 	test_rec->rdata.tsig_record.fudge = 300;
@@ -137,7 +137,7 @@ static int tkey_test(void **state)
 
 	if (testing->name != verifier->name) {
 		err = -1;
-		fprintf(stderr, "tkey_name not found: %s\n", strerror(err));
+		fprintf(stderr, "tkey_test name not found: %s\n", strerror(err));
 		return err;
 	}
 
@@ -156,11 +156,35 @@ static int tkey_test(void **state)
 static int gen_tsig_test(void **state)
 {
 	/* incomplete declarations */
+	/* could use some examples */
 	TALLOC_CTX *mem_ctx;
 	DATA_BLOB in_test = (DATA_BLOB) {.data = NULL, .length = SIZE_MAX};
+	
 	struct dns_client *test_client;
+	test_client->samdb = NULL;
+	test_client->zones = NULL;
+	test_client->tkeys = NULL;
+	test_client->client_credentials = NULL;
+	test_client->max_payload = UINT16_MAX;
+	
 	struct dns_request_state *test_state;
+	test_state->flags = UINT16_MAX;
+	test_state->authenticated = true;
+	test_state->sign = true;
+	test_state->key_name = "TKEY_NAME"
+	test_state->tsig->name = "TSIG_RECORD";
+	test_state->tsig->rr_type = DNS_QTYPE_TSIG;
+	test_state->tsig->rr_class = DNS_QCLASS_ANY;
+	test_state->tsig->ttl = 0;
+	test_state->tsig->length = UINT16_MAX;
+	test_state->tsig_error = UINT16_MAX;
+	
 	struct dns_name_packet *test_packet;
+	test_packet->id = UINT16_MAX;
+	test_packet->qdcount = UINT16_MAX;
+	test_packet->ancount = UINT16_MAX;
+	test_packet->nscount = UINT16_MAX;
+	test_packet->arcount = UINT16_MAX;
 
 	/* test error codes */
 	WERROR test_err = dns_cli_generate_tsig(test_client, mem_ctx,
@@ -172,16 +196,16 @@ static int gen_tsig_test(void **state)
 			return 0;
 		case WERR_NOT_ENOUGH_MEMORY:
 			err = -1;
-			fprintf(stderr, "WERR_NOMEM: %s\n", strerror(err));
+			fprintf(stderr, "gen_tsig WERR_NOMEM: %s\n", strerror(err));
 			return err;
 		case DNS_ERR(FORMAT_ERROR):
 		case DNS_ERR(NOTAUTH):
 			err = -2;
-			fprintf(stderr, "DNS_ERR: %s\n", strerror(err));
+			fprintf(stderr, "gen_tsig DNS_ERR: %s\n", strerror(err));
 			return err;
 		default:
 			err = -3;
-			fprintf(stderr, "Unexpected ERROR: %s\n", strerror(err));
+			fprintf(stderr, "gen_tsig unexpected ERROR: %s\n", strerror(err));
 			return err;
 	};
 
