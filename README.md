@@ -8,3 +8,5 @@ Project log: https://dimgrav.blogspot.gr/
 Samba website: https://www.samba.org/
 
 Samba GitHub mirror: https://github.com/samba-team/samba
+
+Samba-fork: https://github.com/dimgrav/samba
