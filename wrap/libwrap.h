@@ -26,22 +26,21 @@
 
 /* udp */
 tevent_req *udp_req_send(TALLOC_CTX *mem_ctx, struct tevent_context *ev,
-					const char *server_addr_string, const uint8_t *query, size_t query_len);
+			const char *server_addr_string, const uint8_t *query, size_t query_len);
 
 int udp_req_recv(struct tevent_req *req, TALLOC_CTX *mem_ctx,
-			 		uint8_t **reply, size_t *reply_len);
+	uint8_t **reply, size_t *reply_len);
 
 /* tcp */
 tevent_req *tcp_req_send(TALLOC_CTX *mem_ctx, struct tevent_context *ev,
-					const char *server_addr_string, struct iovec *vector, size_t count);
+			const char *server_addr_string, struct iovec *vector, size_t count);
 
 int tcp_req_recv(struct tevent_req *subreq, struct tevent_req *req,
-			 		TALLOC_CTX *mem_ctx, uint8_t **reply, size_t *reply_len);
+	TALLOC_CTX *mem_ctx, uint8_t **reply, size_t *reply_len);
 
 /* tsig gen */
 WERROR tcp_cli_tsig_gen(struct dns_client_tkey_store *store, const char *name,
-					struct dns_client *dns, TALLOC_CTX *mem_ctx,
-		       		struct dns_request_state *state, struct dns_name_packet *packet,
-		        	DATA_BLOB *in);
+	   struct dns_client *dns, TALLOC_CTX *mem_ctx,v struct dns_request_state *state, 
+	   struct dns_name_packet *packet,	DATA_BLOB *in);
 
 #endif /* __LIBWRAP_H__ */

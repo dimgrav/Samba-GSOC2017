@@ -21,7 +21,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "libwrap.h"
+#include "wrap/libwrap.h"
 
 /* wrap dns udp/tcp req send/recv() and tsig generation functions
  * see libcli/dns/lib*.h for wrapped function declarations
@@ -29,7 +29,7 @@
 
 /* udp */
 tevent_req *__wrap_udp_req_send(TALLOC_CTX *mem_ctx, struct tevent_context *ev,
-					const char *server_addr_string, const uint8_t *query, size_t query_len)
+			const char *server_addr_string, const uint8_t *query, size_t query_len)
 {
 	return dns_udp_request_send(TALLOC_CTX *mem_ctx,
 					struct tevent_context *ev,
@@ -39,7 +39,7 @@ tevent_req *__wrap_udp_req_send(TALLOC_CTX *mem_ctx, struct tevent_context *ev,
 }
 
 int __wrap_udp_req_recv(struct tevent_req *subreq, struct tevent_req *req,
-			 		TALLOC_CTX *mem_ctx, uint8_t **reply, size_t *reply_len)
+			TALLOC_CTX *mem_ctx, uint8_t **reply, size_t *reply_len)
 {
 	void dns_udp_request_get_reply(tevent_req *subreq);
 
@@ -51,7 +51,7 @@ int __wrap_udp_req_recv(struct tevent_req *subreq, struct tevent_req *req,
 
 /* tcp */
 tevent_req *__wrap_tcp_req_send(TALLOC_CTX *mem_ctx, struct tevent_context *ev,
-					const char *server_addr_string, struct iovec *vector, size_t count)
+			const char *server_addr_string, struct iovec *vector, size_t count)
 {
 	return dns_tcp_req_send(TALLOC_CTX *mem_ctx,
 					struct tevent_context *ev,
@@ -61,7 +61,7 @@ tevent_req *__wrap_tcp_req_send(TALLOC_CTX *mem_ctx, struct tevent_context *ev,
 }
 
 int __wrap_tcp_req_recv(struct tevent_req *subreq, struct tevent_req *req,
-			 		TALLOC_CTX *mem_ctx, uint8_t **reply, size_t *reply_len)
+			TALLOC_CTX *mem_ctx, uint8_t **reply, size_t *reply_len)
 {
 	void dns_tcp_req_recv_reply(tevent_req *subreq);
 
@@ -73,9 +73,8 @@ int __wrap_tcp_req_recv(struct tevent_req *subreq, struct tevent_req *req,
 
 /* tsig gen */
 WERROR __wrap_tcp_cli_tsig_gen(struct dns_client_tkey_store *store, const char *name,
-					struct dns_client *dns, TALLOC_CTX *mem_ctx,
-		       		struct dns_request_state *state, struct dns_name_packet *packet,
-		        	DATA_BLOB *in)
+	   struct dns_client *dns, TALLOC_CTX *mem_ctx, struct dns_request_state *state, 
+	   struct dns_name_packet *packet, DATA_BLOB *in)
 {
 	struct dns_client_tkey *dns_find_tkey(struct dns_client_tkey_store *store,
 				    const char *name);

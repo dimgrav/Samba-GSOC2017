@@ -19,8 +19,8 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __LIBDNS_H__
-#define __LIBDNS_H__
+#ifndef __LIBUDP_H__
+#define __LIBUDP_H__
 
 /** Send an dns request to a dns server using UDP
  *
@@ -50,4 +50,4 @@ int dns_udp_request_recv(struct tevent_req *req,
 			 uint8_t **reply,
 			 size_t *reply_len);
 
-#endif /*__LIBDNS_H__*/
+#endif /*__LIBUDP_H__*/

@@ -25,12 +25,12 @@
 #include "system/network.h"
 #include <tevent.h>
 #include "lib/tsocket/tsocket.h"
-#include "Samba-GSOC2017/libdns.h"
+#include "udp-cli/libudp.h"
 #include "lib/util/tevent_unix.h"
 #include "lib/util/samba_util.h"
 #include "libcli/util/error.h"
 #include "librpc/gen_ndr/dns.h"
-#include "libtcp.h"
+#include "tcp-cli/libtcp.h"
 
 #define DNS_REQUEST_TIMEOUT 2
 

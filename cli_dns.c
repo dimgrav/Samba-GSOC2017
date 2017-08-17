@@ -28,8 +28,8 @@
 #include "system/network.h"
 #include <tevent.h>
 #include "lib/tsocket/tsocket.h"
-#include "libcli/dns/libdns.h"
-#include "libcli/dns/libtcp.h"
+#include "udp-cli/libudp.h"
+#include "tcp-cli/libtcp.h"
 #include "lib/util/tevent_unix.h"
 #include "lib/util/samba_util.h"
 #include "libcli/util/error.h"
@@ -43,7 +43,7 @@
 #include "libcli/util/ntstatus.h"
 #include "auth/auth.h"
 #include "auth/gensec/gensec.h"
-#include "libcli/dns/libtsig.h"
+#include "gss-tsig/libtsig.h"
 
 #undef DBGC_CLASS
 #define DBGC_CLASS DBGC_DNS
@@ -314,7 +314,7 @@ static void dns_tcp_req_recv_reply(struct tevent_req *subreq)
 	}
 
 	/* response loop */
-	struct dns_server *dns = dns_conn->dns_socket->dns; // uses the same iface with server
+	struct dns_server *dns = dns_conn->dns_socket->dns; // uses server iface
 	struct dns_tcp_connection *dns_conn = tevent_req_callback_data(subreq,
 			struct dns_tcp_connection);
 	struct dns_tcp_call *call;
@@ -397,7 +397,7 @@ int dns_tcp_req_recv(struct tevent_req *req,
 
 /* identify tkey in record */
 struct dns_client_tkey *dns_find_tkey(struct dns_client_tkey_store *store,
-				      const char *name)
+				        const char *name)
 {
 	struct dns_client_tkey *tkey = NULL;
 	uint16_t i = 0;
@@ -422,10 +422,10 @@ struct dns_client_tkey *dns_find_tkey(struct dns_client_tkey_store *store,
 
 /* generate signature and rebuild packet with TSIG */
 static WERROR dns_cli_generate_tsig(struct dns_client *dns,
-		       				TALLOC_CTX *mem_ctx,
-		       				struct dns_request_state *state,
-		        			struct dns_name_packet *packet,
-		        			DATA_BLOB *in)
+		       		TALLOC_CTX *mem_ctx,
+		       		struct dns_request_state *state,
+		   			struct dns_name_packet *packet,
+	      			DATA_BLOB *in)
 {
 	int tsig_flag = 0;
 	struct dns_client_tkey *tkey = NULL;

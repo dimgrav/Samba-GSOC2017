@@ -27,16 +27,14 @@
 #include "libcli/util/ntstatus.h"
 #include "auth/auth.h"
 #include "auth/gensec/gensec.h"
-#include "libtsig.h"
+#include "gss-tsig/libtsig.h"
 
 #undef DBGC_CLASS
 #define DBGC_CLASS DBGC_DNS
 
 /* 
  * make a copy of the original tsig record
- * with null rdata values (for future test purposes)
- * --- probably wrong use of memset(), all fields considered as pointers?  ---
- * will include WERROR handling for t allocations
+ * with null rdata values
  */
 static WERROR dns_empty_tsig(TALLOC_CTX *mem_ctx,
 					struct dns_res_rec *orig_record,
@@ -87,10 +85,10 @@ struct dns_client_tkey *dns_find_tkey(struct dns_client_tkey_store *store,
 
 /* generate signature and rebuild packet with TSIG */
 static WERROR dns_cli_generate_tsig(struct dns_client *dns,
-		       				TALLOC_CTX *mem_ctx,
-		       				struct dns_request_state *state,
-		        			struct dns_name_packet *packet,
-		        			DATA_BLOB *in)
+		       		TALLOC_CTX *mem_ctx,
+		       		struct dns_request_state *state,
+		        	struct dns_name_packet *packet,
+		        	DATA_BLOB *in)
 {
 	int tsig_flag = 0;
 	struct dns_client_tkey *tkey = NULL;
