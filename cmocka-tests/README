@@ -4,4 +4,4 @@ cli_crypto_test -> Transaction key name search and GSS-TSIG signature generation
 dns_tcp_test	-> DNS TCP send/receive request packet test
 dns_udp_test	-> DNS UDP send/receive request packet test
 
-See cli-fn for corresponding libraries
+*See gss-tsig, tcp-cli, udp-cli for corresponding libraries

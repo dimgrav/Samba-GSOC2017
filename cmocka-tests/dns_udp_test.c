@@ -31,7 +31,6 @@
 #include <stddef.h>
 #include <setjmp.h>
 #include <cmocka.h>
-#include "foo.c"
 
 #include "replace.h"
 #include "system/network.h"
