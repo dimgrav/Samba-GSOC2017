@@ -1,0 +1,35 @@
+#!/usr/bin/env python
+
+import os
+
+# configures and builds test suites for cmocka-tests
+def configure(conf):
+	return
+
+def build(bld):
+	bld.SAMBA_BINARY('cli_crypto_test',
+			source='cli_crypto_test.c',
+			public_deps='LIBTSOCKET tevent-util',
+			deps='cmocka',
+			install=False)
+
+	bld.SAMBA_BINARY('dns_tcp_test',
+			source='dns_tcp_test.c',
+			public_deps='LIBTSOCKET tevent-util',
+			deps='cmocka',
+			install=False)
+
+	bld.SAMBA_BINARY('dns_udp_test',
+			source='dns_udp_test.c',
+			public_deps='LIBTSOCKET tevent-util',
+			deps='cmocka',
+			install=False)
+
+	# builds the combined client test (not yet implemented)
+	'''
+	bld.SAMBA_BINARY('client_test',
+			source='cli_dns_test.c',
+			public_deps='LIBTSOCKET tevent-util',
+			deps='cmocka',
+			install=False)
+	'''
