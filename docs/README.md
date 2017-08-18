@@ -1,5 +1,5 @@
-# Unix SMB/CIFS implementation
-### Client-side DNS call handling with GSS-TSIG cryptography
+# Client-side DNS call handling with GSS-TSIG cryptography
+### Unix SMB/CIFS implementation
 ### Dimitrios Gravanis (C) 2017
 ### Based on existing work by Samba Team
 
