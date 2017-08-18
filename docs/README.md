@@ -10,7 +10,7 @@ About
 ***WORK IN PROGRESS***
 
 For the Samba AD DC, libcli/dns is a library that allows the handling of DNS 
-calls (send/receive requests) and generates GSS-TSIG type ecryption signature 
+calls (send/receive requests) and generates GSS-TSIG type encryption signature 
 for signed packets, to accomodate encrypted client-server communication.
 
 It consists of its respective function and structure libraries, that provide 
