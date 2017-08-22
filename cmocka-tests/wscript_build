@@ -1,0 +1,7 @@
+#!/usr/bin/env python
+
+# cli_dns test suite
+bld.SAMBA_BINARY('client_tests',
+		source='cli_tests.c',
+		deps='LIBTSOCKET tevent-util cmocka',
+		install=False)

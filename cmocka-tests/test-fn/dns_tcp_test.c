@@ -36,7 +36,7 @@
 #include "system/network.h"
 #include <tevent.h>
 #include "lib/tsocket/tsocket.h"
-#include "tcp-cli/libtcp.h"
+#include "libcli/dns/libtcp.h"
 #include "lib/util/tevent_unix.h"
 #include "lib/util/samba_util.h"
 #include "libcli/util/error.h"
@@ -44,11 +44,7 @@
 
 #define DNS_REQUEST_TIMEOUT 2
 
-/* test suite --- INCOMPLETE ---
- * do I need to include all the headers used in dns_tcp? 
- * the send/recv() loop should be tested, I'm having a tough time
- * writing tests for void type functions that may need to be mocked
- */
+/* test suite --- INCOMPLETE --- */
 
 /* 
  * return codes
