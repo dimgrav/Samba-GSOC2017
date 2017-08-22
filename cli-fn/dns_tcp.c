@@ -25,21 +25,21 @@
 #include "system/network.h"
 #include <tevent.h>
 #include "lib/tsocket/tsocket.h"
-#include "udp-cli/libudp.h"
+#include "libcli/dns/libudp.h"
 #include "lib/util/tevent_unix.h"
 #include "lib/util/samba_util.h"
 #include "libcli/util/error.h"
 #include "librpc/gen_ndr/dns.h"
-#include "tcp-cli/libtcp.h"
+#include "libcli/dns/libtcp.h"
 
 #define DNS_REQUEST_TIMEOUT 2
 
 /* callbacks */
-static void dns_tcp_req_recv_reply(struct tevent_req *subreq);
-static void dns_tcp_req_done(struct tevent_req *subreq);
+void dns_tcp_req_recv_reply(struct tevent_req *subreq);
+void dns_tcp_req_done(struct tevent_req *subreq);
 
 /* terminate tcp conn with server */
-static void dns_tcp_terminate_connection(struct dns_tcp_connection *dns_conn,
+void dns_tcp_terminate_connection(struct dns_tcp_connection *dns_conn,
 										const char *reason)
 {
 	stream_terminate_connection(dns_conn->conn, reason);
@@ -56,7 +56,7 @@ struct tevent_req *dns_tcp_req_send(TALLOC_CTX *mem_ctx,
 	struct dns_tcp_request_state *state;
 	struct tsocket_address *local_addr, *server_addr;
 	struct tstream_context *stream;
-	int req_ret, soc_ret, err = 0;
+	int req_ret, *soc_ret, *err;
 
 	req = tevent_req_create(mem_ctx, &state, struct dns_tcp_request_state);
 	if (req == NULL) {
@@ -81,7 +81,7 @@ struct tevent_req *dns_tcp_req_send(TALLOC_CTX *mem_ctx,
 	}
 
 	/* must be reviewed! */
-	soc_ret = tstream_inet_tcp_connect_recv(socreq, err, mem_ctx, stream, NULL);
+	soc_ret = tstream_inet_tcp_connect_recv(socreq, *err, mem_ctx, stream, NULL);
 	TALLOC_FREE(socreq);
 	if (soc_ret == -1 && err != 0) {
 		tevent_req_error(socreq, err);
@@ -100,8 +100,8 @@ struct tevent_req *dns_tcp_req_send(TALLOC_CTX *mem_ctx,
 
 	/* not sure how dump_data() works with pointers
 	 * followed source4/heimdal/lib/roken/dumpdata.c
+	 * 	dump_data(10, vector, count);
 	 */
-	dump_data(10, vector, count);
 
 	subreq = tstream_writev_send(mem_ctx, ev, stream, vector, count);
 	if (tevent_req_nomem(subreq, req)) {
@@ -121,7 +121,7 @@ struct tevent_req *dns_tcp_req_send(TALLOC_CTX *mem_ctx,
 }
 
 /* get buffer and wait to receive server response */
-static void dns_tcp_req_recv_reply(struct tevent_req *subreq)
+void dns_tcp_req_recv_reply(struct tevent_req *subreq)
 {
 	struct tevent_req *req = tevent_req_callback_data(subreq,
 						struct tevent_req);
@@ -145,9 +145,9 @@ static void dns_tcp_req_recv_reply(struct tevent_req *subreq)
 	}
 
 	/* response loop */
-	struct dns_server *dns = dns_conn->dns_socket->dns; // uses the same iface with server
 	struct dns_tcp_connection *dns_conn = tevent_req_callback_data(subreq,
 			struct dns_tcp_connection);
+	struct dns_client *dns = dns_conn->dns_socket->dns; // uses server iface
 	struct dns_tcp_call *call;
 
 	call = talloc(dns_conn, struct dns_tcp_call);
@@ -162,7 +162,7 @@ static void dns_tcp_req_recv_reply(struct tevent_req *subreq)
 	TALLOC_FREE(subreq);
 	if (!NT_STATUS_IS_OK(status)) {
 		dns_tcp_terminate_connection(dns_conn,
-		"tstream_read_pdu_blob_recv(): error %s", nt_errstr(status));
+		("tstream_read_pdu_blob_recv(): error %s", nt_errstr(status)));
 		return;
 	}
 
@@ -185,10 +185,15 @@ static void dns_tcp_req_recv_reply(struct tevent_req *subreq)
 }
 
 /* callback status */
-static void dns_tcp_req_done(struct tevent_req *subreq)
+void dns_tcp_req_done(struct tevent_req *subreq)
 {
 	struct tevent_req *req = tevent_req_callback_data(subreq, struct tevent_req);
-	WERROR err = dns_process_recv(subreq, call, &call->out);
+	struct dns_tcp_connection *dns_conn = tevent_req_callback_data(subreq,
+			struct dns_tcp_connection);
+	struct dns_tcp_call *call;
+	WERROR err;
+	err = dns_process_recv(subreq, call, &call->out);
+
 	TALLOC_FREE(subreq);
 
 	if (!W_ERROR_IS_OK(err)) {

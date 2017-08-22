@@ -23,7 +23,7 @@
 #include "system/network.h"
 #include <tevent.h>
 #include "lib/tsocket/tsocket.h"
-#include "udp-cli/libudp.h"
+#include "libcli/dns/libudp.h"
 #include "lib/util/tevent_unix.h"
 #include "lib/util/samba_util.h"
 #include "libcli/util/error.h"

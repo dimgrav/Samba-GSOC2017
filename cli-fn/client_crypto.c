@@ -27,7 +27,7 @@
 #include "libcli/util/ntstatus.h"
 #include "auth/auth.h"
 #include "auth/gensec/gensec.h"
-#include "gss-tsig/libtsig.h"
+#include "libcli/dns/libtsig.h"
 
 #undef DBGC_CLASS
 #define DBGC_CLASS DBGC_DNS
@@ -59,8 +59,8 @@ static WERROR dns_empty_tsig(TALLOC_CTX *mem_ctx,
 }
 
 /* identify tkey in record */
-struct dns_client_tkey *dns_find_tkey(struct dns_client_tkey_store *store,
-				      const char *name)
+struct dns_client_tkey *dns_find_cli_tkey(struct dns_client_tkey_store *store,
+				        const char *name)
 {
 	struct dns_client_tkey *tkey = NULL;
 	uint16_t i = 0;
@@ -86,9 +86,9 @@ struct dns_client_tkey *dns_find_tkey(struct dns_client_tkey_store *store,
 /* generate signature and rebuild packet with TSIG */
 static WERROR dns_cli_generate_tsig(struct dns_client *dns,
 		       		TALLOC_CTX *mem_ctx,
-		       		struct dns_request_state *state,
-		        	struct dns_name_packet *packet,
-		        	DATA_BLOB *in)
+		       		struct dns_request_cli_state *state,
+		   			struct dns_name_packet *packet,
+	      			DATA_BLOB *in)
 {
 	int tsig_flag = 0;
 	struct dns_client_tkey *tkey = NULL;
@@ -120,7 +120,7 @@ static WERROR dns_cli_generate_tsig(struct dns_client *dns,
 	}
 
 	/* save the keyname from the TSIG request to add MAC later */
-	tkey = dns_find_tkey(dns->tkeys, state->tsig->name);
+	tkey = dns_find_cli_tkey(dns->tkeys, state->tsig->name);
 	if (tkey == NULL) {
 		state->key_name = talloc_strdup(state->mem_ctx,
 						state->tsig->name);
