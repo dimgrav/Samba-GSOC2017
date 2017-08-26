@@ -27,6 +27,7 @@
 #include "librpc/gen_ndr/dns.h"
 #include "librpc/gen_ndr/ndr_dnsp.h"
 
+
 /** error definitions **/
 uint8_t werr_to_dns_err(WERROR werr);
 #define DNS_ERR(err_str) WERR_DNS_ERROR_RCODE_##err_str
@@ -39,6 +40,7 @@ struct dns_client_zone {
 };
 
 struct dns_client {
+	struct task_server *task;
 	struct ldb_context *samdb;
 	struct dns_client_zone *zones;
 	struct dns_client_tkey_store *tkeys;
@@ -46,7 +48,7 @@ struct dns_client {
 	uint16_t max_payload;
 };
 
-struct dns_request_state {
+struct dns_request_cli_state {
 	TALLOC_CTX *mem_ctx;
 	uint16_t flags;
 	bool authenticated;
@@ -82,16 +84,8 @@ struct dns_client_tkey_store {
  *@param name   name to match
  *@return tkey
  */
-struct dns_client_tkey *dns_find_tkey(struct dns_client_tkey_store *store,
-				      const char *name)
-
-/* Compare DNS key name in record to the expected name
- *
- *@param name1 	name to match
- *@param name2  name to compare with name1
- *@return true/false
- */
-bool dns_name_equal(const char *name1, const char *name2);
+struct dns_client_tkey *dns_find_cli_tkey(struct dns_client_tkey_store *store,
+				      const char *name);
 
 /* Make a record copy with empty TSIG rdata
  *
@@ -116,7 +110,7 @@ WERROR dns_empty_tsig(TALLOC_CTX *mem_ctx,
 WERROR dns_cli_generate_sig(struct dns_client *dns,
 		       TALLOC_CTX *mem_ctx,
 		       struct dns_name_packet *packet,
-		       struct dns_request_state *state,
+		       struct dns_request_cli_state *state,
 		       DATA_BLOB *in);
 
 #endif /* __LIBTSIG_H__ */

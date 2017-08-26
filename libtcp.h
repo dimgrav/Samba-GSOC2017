@@ -26,7 +26,7 @@
 
 #include "source4/dns_server/dns_server.h"
 #include "source4/dns_server/dnsserver_common.h"
-#include "lib/tsocket/tsocket.h"
+
 
 /** DNS TCP definitions **/
 struct tsocket_address;
@@ -38,7 +38,7 @@ struct dns_socket {
 
 struct dns_tcp_request_state {
 	struct tevent_context *ev;
-	struct tstream_context *stream;
+	struct tstream_context **tstream;
 	size_t v_count;
 	uint32_t *reply;
 	size_t reply_len;
@@ -92,14 +92,5 @@ int dns_tcp_req_recv(struct tevent_req *req,
 /* Callbacks */
 void dns_tcp_req_recv_reply(struct tevent_req *subreq);
 void dns_tcp_req_done(struct tevent_req *subreq);
-
-/* Terminate connection 
- * 
- * @param dns_conn current DNS TCP connection	
- * @param reason   reason of termination
- * @return void
- */
-void dns_tcp_terminate_connection(struct dns_tcp_connection *dns_conn, 
-					const char *reason);
 
 #endif /*__LIBTCP_H__*/

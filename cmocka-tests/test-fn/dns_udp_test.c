@@ -31,27 +31,14 @@
 #include <stddef.h>
 #include <setjmp.h>
 #include <cmocka.h>
+#include "libcli/dns/cli-fn/dns_udp.c"
 
-#include "replace.h"
-#include "system/network.h"
-#include <tevent.h>
-#include "lib/tsocket/tsocket.h"
-#include "libcli/dns/libudp.h"
-#include "lib/util/tevent_unix.h"
-#include "lib/util/samba_util.h"
-#include "libcli/util/error.h"
-#include "librpc/gen_ndr/dns.h"
+/* test suite --- INCOMPLETE --- */
 
-#define DNS_REQUEST_TIMEOUT 2
+/** test udp send/recv functionality **/
 
-/* test suite */
-
-/* 
- * return codes
- *  0 :	(success) async udp request sent
- * -1 :	failed to create udp request
- */
-static int test_request_send(void **state)
+/* calls fail() if UDP test_req is NULL */
+static void test_request_send(void **state)
 {
 	/* pending */
 	TALLOC_CTX *mem_ctx;
@@ -62,24 +49,13 @@ static int test_request_send(void **state)
 
 	struct tevent_req *test_req = dns_udp_request_send(mem_ctx, test_ev,
 			test_server_addr_string, test_query, test_query_len);
-
-	int err;
-	if (test_req == NULL)
-	{
-		err = -1;
-		fprintf(stderr, "NULL async UDP request: %s\n", strerror(err));
-		return err;
-	} else {
-		return 0;
-	}
-
+	
+	assert_non_null(test_req);
 	TALLOC_FREE(mem_ctx);
+	return;
 }
 
-/* 
- * calls fail() if test_subreq is NULL
- * prints error message to stderr stream
- */
+/* calls fail() if test_subreq is NULL */
 static void test_request_get_reply(void **state)
 {
 	/* pending */
@@ -89,10 +65,7 @@ static void test_request_get_reply(void **state)
 	return;
 }
 
-/* 
- * calls fail() if test_subreq is NULL
- * prints error message to stderr stream
- */
+/* calls fail() if test_subreq is NULL */
 static void test_request_done(void **state)
 {
 	/* pending */
@@ -102,12 +75,8 @@ static void test_request_done(void **state)
 	return;
 }
 
-/* 
- * return codes
- *  0 :	(success) async request received
- * -1 :	failed to receive request
- */
-static int test_request_recv(void **state)
+/* calls fail() if test_rcv is not 0 */
+static void test_request_recv(void **state)
 {
 	/* incomplete */
 	struct tevent_req *test_req;
@@ -117,30 +86,23 @@ static int test_request_recv(void **state)
 
 	/* pending */
 	int test_rcv = dns_udp_request_recv(test_req, mem_ctx, test_reply, test_reply_len);
-	int err;
-
-	if (test_rcv == 0) {
-		return 0;
-	} else {
-		err = -1;
-		fprintf(stderr, "Unexpected UDP request recv failure: %s\n", strerror(err));
-		return err;
-	};
-
+	
+	assert_int_equal(test_rcv, 0);
 	TALLOC_FREE(mem_ctx);
+	return;
 }
 
 /* run test suite */
 int main(void)
 {
 	/* tests structure */
-	const struct CMUnitTest udp_tests[] = {
-		cmocka_unit_test(test_request_send);
-		cmocka_unit_test(test_request_get_reply);
-		cmocka_unit_test(test_request_done);
-		cmocka_unit_test(test_request_recv);
+	const struct CMUnitTest tests[] = {
+		cmocka_unit_test(test_request_send),
+		cmocka_unit_test(test_request_get_reply),
+		cmocka_unit_test(test_request_done),
+		cmocka_unit_test(test_request_recv),
 	};
 
 	cmocka_set_message_output(CM_OUTPUT_SUBUNIT);
-	return cmocka_run_group_tests(udp_tests, NULL, NULL);
+	return cmocka_run_group_tests(tests, NULL, NULL);
 }

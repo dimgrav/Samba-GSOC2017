@@ -21,7 +21,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "wrap/libwrap.h"
+#include "libcli/dns/libwrap.h"
 
 /* wrap dns udp/tcp req send/recv() and tsig generation functions
  * see libcli/dns/lib*.h for wrapped function declarations
@@ -76,7 +76,7 @@ WERROR __wrap_tcp_cli_tsig_gen(struct dns_client_tkey_store *store, const char *
 	   struct dns_client *dns, TALLOC_CTX *mem_ctx, struct dns_request_state *state, 
 	   struct dns_name_packet *packet, DATA_BLOB *in)
 {
-	struct dns_client_tkey *dns_find_tkey(struct dns_client_tkey_store *store,
+	struct dns_client_tkey *dns_find_cli_tkey(struct dns_client_tkey_store *store,
 				    const char *name);
 
 	return dns_cli_generate_tsig(struct dns_client *dns, TALLOC_CTX *mem_ctx,

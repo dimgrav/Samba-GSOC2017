@@ -23,10 +23,12 @@
 
 #include "includes.h"
 #include "lib/crypto/hmacmd5.h"
-#include "system/network.h"
 #include "libcli/util/ntstatus.h"
 #include "auth/auth.h"
 #include "auth/gensec/gensec.h"
+#include "lib/util/data_blob.h"
+#include "lib/util/time.h"
+#include "source4/dns_server/dns_server.h"
 #include "libcli/dns/libtsig.h"
 
 #undef DBGC_CLASS
@@ -74,7 +76,7 @@ struct dns_client_tkey *dns_find_cli_tkey(struct dns_client_tkey_store *store,
 		if (tmp_key == NULL) {
 			continue;
 		}
-		if (dns_name_equal(name, tmp_key->name)) {
+		if (strcmp(name, tmp_key->name) == 0) {
 			tkey = tmp_key;
 			break;
 		}
@@ -84,7 +86,7 @@ struct dns_client_tkey *dns_find_cli_tkey(struct dns_client_tkey_store *store,
 }
 
 /* generate signature and rebuild packet with TSIG */
-static WERROR dns_cli_generate_tsig(struct dns_client *dns,
+WERROR dns_cli_generate_tsig(struct dns_client *dns,
 		       		TALLOC_CTX *mem_ctx,
 		       		struct dns_request_cli_state *state,
 		   			struct dns_name_packet *packet,

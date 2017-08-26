@@ -3,5 +3,5 @@
 # cli_dns test suite
 bld.SAMBA_BINARY('client_tests',
 		source='cli_tests.c',
-		deps='LIBTSOCKET tevent-util cmocka',
+		deps='LIBTSOCKET tevent-util cmocka gensec auth samba_server_gensec dnsserver_common',
 		install=False)

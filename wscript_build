@@ -2,5 +2,6 @@
 
 # builds a library for DNS TCP/UDP calls that utilizes GSS-TSIG encryption
 bld.SAMBA_SUBSYSTEM('clidns',
-        source='cli_dns.c',
-        public_deps='LIBTSOCKET tevent-util')
+	    source='cli_dns.c',
+	    public_deps='LIBTSOCKET tevent-util',
+	    deps='gensec auth samba_server_gensec dnsserver_common')

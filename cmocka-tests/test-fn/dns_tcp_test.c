@@ -31,27 +31,14 @@
 #include <stddef.h>
 #include <setjmp.h>
 #include <cmocka.h>
+#include "libcli/dns/cli-fn/dns_tcp.c"
 
-#include "replace.h"
-#include "system/network.h"
-#include <tevent.h>
-#include "lib/tsocket/tsocket.h"
-#include "libcli/dns/libtcp.h"
-#include "lib/util/tevent_unix.h"
-#include "lib/util/samba_util.h"
-#include "libcli/util/error.h"
-#include "librpc/gen_ndr/dns.h"
+/* --- INCOMPLETE ---*/
 
-#define DNS_REQUEST_TIMEOUT 2
+/** test tcp send/recv functionality **/
 
-/* test suite --- INCOMPLETE --- */
-
-/* 
- * return codes
- *  0 :	(success) async tcp request sent
- * -1 :	failed to create tcp request
- */
-static int test_req_send(void **state)
+/* calls fail() if TCP test_req is NULL */
+static void test_req_send(void **state)
 {
 	/* incomplete */
 	TALLOC_CTX *mem_ctx;
@@ -63,25 +50,12 @@ static int test_req_send(void **state)
 	struct tevent_req *test_req = dns_tcp_req_send(mem_ctx, test_ev,
 			test_server_addr_string, test_vector, test_count);
 
-	/* pending */
-	int err;
-	/* switch statement used in case more checks need to be added */
-	switch (test_req) {
-		case NULL:
-			err = -1;
-			fprintf(stderr, "NULL async TCP request: %s\n", strerror(err));
-			return err;
-		default:
-			return 0;
-	};
-
+	assert_non_null(test_req);
 	TALLOC_FREE(mem_ctx);
+	return;
 }
 
-/* 
- * calls fail() if test_subreq is NULL
- * prints error message to stderr stream
- */
+/* calls fail() if test_subreq is NULL */
 static void test_req_recv_reply(void **state)
 {
 	/* pending */
@@ -91,10 +65,7 @@ static void test_req_recv_reply(void **state)
 	return;
 }
 
-/* 
- * calls fail() if test_subreq is NULL
- * prints error message to stderr stream
- */
+/* calls fail() if test_subreq is NULL */
 static void test_req_done(void **state)
 {
 	/* pending */
@@ -104,45 +75,34 @@ static void test_req_done(void **state)
 	return;
 }
 
-/* 
- * return codes
- *  0 :	(success) async request received
- * -1 :	failed to receive request
- */
-static int test_req_recv(void **state)
+/* calls fail() if test_rcv is not 0 */
+static void test_req_recv(void **state)
 {
 	/* incomplete */
-	struct tevent_req *test_req;
 	TALLOC_CTX *mem_ctx;
+	struct tevent_req *test_req;
 	uint8_t **test_reply = UINT8_MAX;
 	size_t *test_reply_len = SIZE_MAX;
 
 	/* pending */
 	int test_rcv = dns_tcp_req_recv(test_req, mem_ctx, test_reply, test_reply_len);
-	int err;
-
-	if (test_rcv == 0) {
-		return 0;
-	} else {
-		err = -1;
-		fprintf(stderr, "Unexpected req recv failure: %s\n", strerror(err));
-		return err;
-	};
-
+	
+	assert_int_equal(test_rcv, 0);
 	TALLOC_FREE(mem_ctx);
+	return;
 }
 
 /* run test suite */
 int main(void)
 {
 	/* tests structure */
-	const struct CMUnitTest tcp_tests[] = {
-		cmocka_unit_test(test_req_send);
-		cmocka_unit_test(test_req_recv_reply);
-		cmocka_unit_test(test_req_done);
-		cmocka_unit_test(test_req_recv);
+	const struct CMUnitTest tests[] = {
+		cmocka_unit_test(test_req_send),
+		cmocka_unit_test(test_req_recv_reply),
+		cmocka_unit_test(test_req_done),
+		cmocka_unit_test(test_req_recv),
 	};
 
 	cmocka_set_message_output(CM_OUTPUT_SUBUNIT);
-	return cmocka_run_group_tests(tcp_tests, NULL, NULL);
+	return cmocka_run_group_tests(tests, NULL, NULL);
 }

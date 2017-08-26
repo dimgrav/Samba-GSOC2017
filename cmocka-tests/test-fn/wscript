@@ -2,21 +2,11 @@
 
 import os
 
-APPNAME = 'DNS Client Tests'
-
-top = '.'
 out = 'build-tests'
-
-# configuration options
-def options(opt):
-	opt.get_option_group('configure options')
 
 # configures and builds individual tests in /cmocka-tests/test-fn
 def configure(conf):
-	print('prefix set to: ' + conf.options.prefix)
-	print('src dir (blank: default): ' + conf.options.top)
-	print('bld dir (blank: default): ' + conf.options.out)
-	print('configuring test suites in build dir...')
+	print('configuring test suites in ' + out + '...')
 	return
 
 def build(bld):
@@ -37,10 +27,5 @@ def build(bld):
 			source='dns_udp_test.c',
 			deps='LIBTSOCKET tevent-util cmocka',
 			install=False)
+			
 	print('DONE')
-
-# creates tarball
-def dist(ctx):
-	ctx.base_name = 'libcli-dns-tests'
-	ctx.algo = 'tar.gz'
-	ctx.excl = '**/wscript'
