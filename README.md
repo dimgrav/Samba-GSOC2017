@@ -28,7 +28,7 @@ The code patches are currently under review by Samba Team. To build Samba includ
 Links
 --------------------------------------------------------
 
-Samba fork with the integrated new code can be found [here](https://github.com/dimgrav/samba)
+Samba fork with the integrated new code can be found [here](https://github.com/dimgrav/samba).
 
 For more information on the project goals, read the GSoC proposal [here](https://summerofcode.withgoogle.com/projects/#6642229069217792).
 
