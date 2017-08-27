@@ -1,78 +1,35 @@
-# Client-side DNS call handling with GSS-TSIG
-### Unix SMB/CIFS implementation
+# Google Summer of Code 2017
+### Project: improve libcli/dns
 ### Dimitrios Gravanis (C) 2017
-### Based on the existing work by Samba Team
+### Organization: Samba
 
 --------------------------------------------------------
-About
+Description
 --------------------------------------------------------
 
-***WORK IN PROGRESS***
+Samba comes with its own asynchronous DNS parser framework developed for the internal DNS server. Basic calls have been implemented for a client-side library as well, but a more fleshed out implementation would be needed. The goal of this project is to implement more high-level calls handling DNS requests, such as UDP/TCP switchover and client-side GSS-TSIG cryptography. A test suite excercising all the functions is required and can be used to cross-check and complement the existing DNS server tests already shipped by Samba. This testsuite should use cmocka.
 
-For the Samba AD DC, libcli/dns is a library that allows the handling of DNS 
-calls (send/receive requests) and generates GSS-TSIG type encryption signature 
-for signed packets, to accomodate encrypted client-server communication.
+* Difficulty: Medium
+* Language(s): C
+* Mentors: Kai Blin, David Disseldorp
+* Student: Dimitris Gravanis
 
-It consists of its respective function and structure libraries, that provide 
-definitions for client-side functionality.
+--------------------------------------------------------
+Important information
+--------------------------------------------------------
 
-Test suites are also available, that inspect individual features of cli_dns.c
+This repository serves as a "mirror" to [dimgrav/samba fork](https://github.com/dimgrav/samba/tree/master/libcli/dns), in order to clearly reflect my personal work during the duration of GSoC 2017, for the Samba Active Directory/Domain Controller.
+
+The developed code is ***NOT*** a standalone feature and requires integration to the rest of the Samba AD/DC source code to run.
+
+The code patches are currently under review by Samba Team. To build Samba including the new code, please visit the fork linked above and clone it to your system.
+
+--------------------------------------------------------
+Links
+--------------------------------------------------------
 
 For more information on the project goals, read the GSoC proposal [here](https://summerofcode.withgoogle.com/projects/#6642229069217792).
 
 The project timeline and development journal is documented in its dedicated [blogspot](https://dimgrav.blogspot.gr/).
 
---------------------------------------------------------
-Content listing and descriptions
---------------------------------------------------------
-
-1. cli-fn
-
-	* client_crypto.c: GSS-TSIG client-side handling for signed packets
-	* dns_tcp.c: TCP client-side DNS call handling
-	* dns_udp.c: Small async DNS library for Samba with socketwrapper support (pre-existing dns.c)
-
-2. cmocka-tests
-
-	* cli_crypto_test.c: Tests GSS-TSIG client-side handling for signed $
-	* dns_tcp_test.c: Tests TCP client-side DNS call handling
-	* dns_udp_test.c: Tests UDP client-side DNS call handling
-	* cli_tests: Complete test suite for libcli/dns/cli_dns.c
-
-3. cli_dns.c: DNS UDP/TCP call handler with socketwrapper support and TSIG generation (replaces dns.c)
-
-4. dns.h: Internal DNS query structures
-
-5. libtcp.h: TCP client-side DNS structures
-
-6. libtsig.h: GSS-TSIG client-side DNS structures and utilites
-
-7. libudp.h: Small async DNS library for Samba with socketwrapper support (pre-existing libdns.h)
-
-8. libwrap.h: DNS UDP/TCP send/recv wrap library with TSIG generation
-
-9. wrap_cli.c: DNS UDP/TCP send/recv wrapping with TSIG generation
-
---------------------------------------------------------
-DNS Client (with wrapper support)
---------------------------------------------------------
-
-Handles TCP and UDP requests.
-
-The client may use either TCP or UDP protocols to send a DNS name request to
-the server, then handle the reception of the appropriate server response.
-
-Features:
-
-* UDP request send/receive
-* TCP request send/receive
-* GSS-TSIG generation
-* DNS name packet parsing and signing
-
-The library consists of cli_dns.c, that includes functions, and dns.h, libtcp.h, 
-libtsig.h, libudp.h, that provide declarations, definitions and structures.
-
-### Wrapping
-wrap_cli.c provides multiple wrapping of the above functionality, to hide buffer
-creation, DNS packet parsing and signature generation. Definitions of the wrapped
-functions are provided in libwrap.h.
+Project wiki page in [Samba Wiki](https://wiki.samba.org/index.php/SoC/2017#Improve_libcli.2Fdns).
