@@ -22,11 +22,13 @@ This repository serves as a "mirror" to [dimgrav/samba fork](https://github.com/
 
 The developed code is ***NOT*** a standalone feature and requires integration to the rest of the Samba AD/DC source code to run.
 
-The code patches are currently under review by Samba Team. To build Samba including the new code, please visit the fork linked above and clone it to your system.
+The code patches are currently under review by Samba Team. To build Samba including the new code, please visit the fork listed in the "Links" section and clone it to your system.
 
 --------------------------------------------------------
 Links
 --------------------------------------------------------
+
+Samba fork with the integrated new code can be found [here](https://github.com/dimgrav/samba)
 
 For more information on the project goals, read the GSoC proposal [here](https://summerofcode.withgoogle.com/projects/#6642229069217792).
 
