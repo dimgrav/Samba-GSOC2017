@@ -1,7 +1,5 @@
 /* Tests GSS-TSIG client-side handling for signed packets.
  * 
- * --WORK IN PROGRESS--
- *
  * Copyright 2017 (c) Dimitrios Gravanis
  *
  * Uses cmocka C testing API.
@@ -33,7 +31,6 @@
 #include <cmocka.h>
 #include "libcli/dns/cli-fn/client_crypto.c"
 
-/* --- INCOMPLETE --- */
 
 /** test gss-tsig functionality **/
 
@@ -73,8 +70,6 @@ static struct dns_client_tkey *test_tkey_name(void) {
 /* calls fail() if assertions are false */
 static void tkey_test(void **state)
 {
-	/* pending */
-	int err;
 	struct dns_client_tkey_store *test_store;
 	const char *test_name = "TEST_TKEY";
 	
@@ -96,14 +91,8 @@ static void tkey_test(void **state)
 /* calls fail() if test_werr not in werr_set */
 static void gen_tsig_test(void **state)
 {
-	/* incomplete declarations */
 	TALLOC_CTX *mem_ctx;
 	DATA_BLOB *in_test = {NULL, SIZE_MAX};
-	unsigned long werr_set[4];
-	werr_set[0] = 0x0;
-	werr_set[1] = 0x8;
-	werr_set[2] = 0x2329;
-	werr_set[3] = 0x2331;
 	
 	struct dns_client *test_client;
 	test_client->samdb = NULL;
@@ -132,10 +121,15 @@ static void gen_tsig_test(void **state)
 	test_packet->arcount = UINT16_MAX;
 
 	/* test error codes */
-	WERROR test_werr = (unsigned long) dns_cli_generate_tsig(test_client, mem_ctx,
+	WERROR test_werr = dns_cli_generate_tsig(test_client, mem_ctx,
 								test_state, test_packet, in_test);
 
-	assert_in_set(test_werr, werr_set, 4);
+	/* expected WERROR output */
+	assert_true(W_ERROR_IS_OK(test_werr));
+	assert_true(W_ERROR_EQUAL(WERR_NOT_ENOUGH_MEMORY, test_werr));
+	assert_true(W_ERROR_EQUAL(DNS_ERR(FORMAT_ERROR), test_werr));
+	assert_true(W_ERROR_EQUAL(DNS_ERR(NOTAUTH), test_werr));
+
 	TALLOC_FREE(mem_ctx);
 	return;
 }

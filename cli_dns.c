@@ -48,6 +48,7 @@
 #include "source4/smbd/service_stream.h"
 #include "source4/lib/stream/packet.h"
 #include "librpc/ndr/libndr.h"
+#include "librpc/gen_ndr/dns.h"
 #include "librpc/gen_ndr/ndr_dns.h"
 #include "librpc/gen_ndr/ndr_dnsp.h"
 #include "lib/tsocket/tsocket.h"
@@ -57,7 +58,6 @@
 #include "lib/util/tevent_werror.h"
 #include "lib/util/samba_util.h"
 #include "libcli/util/error.h"
-#include "librpc/gen_ndr/dns.h"
 
 #define DNS_REQUEST_TIMEOUT 2
 
@@ -363,11 +363,7 @@ void dns_tcp_req_done(struct tevent_req *subreq)
 	struct dns_tcp_call *call;
 	
 	WERROR err;
-	/*
-	err = dns_process_recv(subreq, call, &call->out);
 	
-	TALLOC_FREE(subreq);
-	*/
 	if (!W_ERROR_IS_OK(err)) {
 		DEBUG(1, ("dns_req_done error: %s\n", win_errstr(err)));
 		return;

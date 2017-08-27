@@ -1,7 +1,5 @@
 /* Tests UDP client-side DNS call handling.
  * 
- * --WORK IN PROGRESS--
- *
  * Copyright 2017 (c) Dimitrios Gravanis
  *
  * Uses cmocka C testing API.
@@ -33,7 +31,6 @@
 #include <cmocka.h>
 #include "libcli/dns/cli-fn/dns_udp.c"
 
-/* test suite --- INCOMPLETE --- */
 
 /** test udp send/recv functionality **/
 

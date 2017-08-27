@@ -1,6 +1,9 @@
 ## README: test suites
 
-***WORK IN PROGRESS***
+
+*Test suite cli_tests.c is functional and currently incorporated in Samba/wscript/*
+
+*Individual test suites are functional, but stand alone waf built is not yet supported.*
 
 Tests for the client features are divided in four different test suites:
 
@@ -11,31 +14,31 @@ Tests for the client features are divided in four different test suites:
 
 *See cli-fn for corresponding libraries*
 
-### Configure and Build test suites
+### Configure and Build complete test suite
 
-*Samba uses [Waf](https://waf.io/) for package configuration, building and installation.*
+The Samba top-level wscript and wscript_build have been modified to recursively implement test suites in 
+Samba builds. Running `$ waf configure && waf` in Samba top-level directory, takes care of creating the 
+test executable and incorporating it during the building process.
 
-*Check [The Waf Book](https://waf.io/book/#_projects_and_commands) for detailed information and tutorials.*
+### Configure and Build individual test suites
 
-In dns/cmocka-tests:
-`$ waf configure --option`
+You can build and incorporate individual tests in Samba builds, by configuring Samba with the "ENABLE_SELFTEST" 
+option:
 
-configure options
+`$ ./configure --enable-selftest`
 
+### Configure and Build individual test suites (standalone)
+
+Samba contributors, or anyone interested in the specific code, may wish to build the individual tests for 
+feature testing and/or other development purposes. To do so:
+
+In dns/cmocka-tests/test-fn/:
 ```
--o OUT, --out=OUT   build dir for the project
+$ waf configure
 
--t TOP, --top=TOP   src dir for the project
-
---prefix=PREFIX     installation prefix [default: '/usr/local/']
-
---download          try to download the tools if missing
+$ waf
 ```
-
 *default build directory is set to cmocka-tests/build-tests*
-
-In dns/cmocka-tests:
-`$ waf build`
 
 To clean "leftovers":
 
@@ -44,3 +47,4 @@ $ waf clean
 
 $ waf distclean
 ```
+

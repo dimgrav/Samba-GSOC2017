@@ -1,7 +1,5 @@
 /* DNS UDP/TCP send/recv wrap library with TSIG generation.
  *
- * --WORK IN PROGRESS--
- *
  * Copyright (C) 2017 Dimitrios Gravanis
  * 
  * Based on the existing work on Samba Unix SMB/CIFS implementation by
@@ -25,14 +23,14 @@
 #define __LIBWRAP_H__
 
 /* udp */
-tevent_req *udp_req_send(TALLOC_CTX *mem_ctx, struct tevent_context *ev,
+struct tevent_req *udp_req_send(TALLOC_CTX *mem_ctx, struct tevent_context *ev,
 			const char *server_addr_string, const uint8_t *query, size_t query_len);
 
 int udp_req_recv(struct tevent_req *req, TALLOC_CTX *mem_ctx,
 	uint8_t **reply, size_t *reply_len);
 
 /* tcp */
-tevent_req *tcp_req_send(TALLOC_CTX *mem_ctx, struct tevent_context *ev,
+struct tevent_req *tcp_req_send(TALLOC_CTX *mem_ctx, struct tevent_context *ev,
 			const char *server_addr_string, struct iovec *vector, size_t count);
 
 int tcp_req_recv(struct tevent_req *subreq, struct tevent_req *req,

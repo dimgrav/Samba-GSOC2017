@@ -1,7 +1,5 @@
 /* GSS-TSIG client-side handling for signed packets.
  *
- * --WORK IN PROGRESS--
- *
  * Copyright (C) 2017 Dimitrios Gravanis
  * 
  * Based on the existing work on Samba Unix SMB/CIFS implementation by

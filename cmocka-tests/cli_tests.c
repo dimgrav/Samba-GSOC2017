@@ -56,6 +56,7 @@
 #include "source4/smbd/service_stream.h"
 #include "source4/lib/stream/packet.h"
 #include "librpc/ndr/libndr.h"
+#include "librpc/gen_ndr/dns.h"
 #include "librpc/gen_ndr/ndr_dns.h"
 #include "librpc/gen_ndr/ndr_dnsp.h"
 #include "lib/tsocket/tsocket.h"
@@ -65,15 +66,12 @@
 #include "lib/util/tevent_werror.h"
 #include "lib/util/samba_util.h"
 #include "libcli/util/error.h"
-#include "librpc/gen_ndr/dns.h"
 
 #define DNS_REQUEST_TIMEOUT 2
 
 #undef DBGC_CLASS
 #define DBGC_CLASS DBGC_DNS
 
-
-/* --- INCOMPLETE ---*/
 
 /** test tcp send/recv functionality **/
 
@@ -98,7 +96,6 @@ static void test_req_send(void **state)
 /* calls fail() if test_subreq is NULL */
 static void test_req_recv_reply(void **state)
 {
-	/* pending */
 	struct tevent_req *test_subreq;
 	assert_non_null(test_subreq);
 	dns_tcp_req_recv_reply(test_subreq);
@@ -108,7 +105,6 @@ static void test_req_recv_reply(void **state)
 /* calls fail() if test_subreq is NULL */
 static void test_req_done(void **state)
 {
-	/* pending */
 	struct tevent_req *test_subreq;
 	assert_non_null(test_subreq);
 	dns_tcp_req_done(test_subreq);
@@ -118,13 +114,11 @@ static void test_req_done(void **state)
 /* calls fail() if test_rcv is not 0 */
 static void test_req_recv(void **state)
 {
-	/* incomplete */
 	TALLOC_CTX *mem_ctx;
 	struct tevent_req *test_req;
 	uint8_t **test_reply = UINT8_MAX;
 	size_t *test_reply_len = SIZE_MAX;
 
-	/* pending */
 	int test_rcv = dns_tcp_req_recv(test_req, mem_ctx, test_reply, test_reply_len);
 	
 	assert_int_equal(test_rcv, 0);
@@ -137,7 +131,6 @@ static void test_req_recv(void **state)
 /* calls fail() if UDP test_req is NULL */
 static void test_request_send(void **state)
 {
-	/* pending */
 	TALLOC_CTX *mem_ctx;
 	struct tevent_context *test_ev;
 	const char *test_server_addr_string = "TEST_SRVR_ADDR";
@@ -155,7 +148,6 @@ static void test_request_send(void **state)
 /* calls fail() if test_subreq is NULL */
 static void test_request_get_reply(void **state)
 {
-	/* pending */
 	struct tevent_req *test_subreq;
 	assert_non_null(test_subreq);
 	dns_udp_request_get_reply(test_subreq);
@@ -165,7 +157,6 @@ static void test_request_get_reply(void **state)
 /* calls fail() if test_subreq is NULL */
 static void test_request_done(void **state)
 {
-	/* pending */
 	struct tevent_req *test_subreq;
 	assert_non_null(test_subreq);
 	dns_udp_request_done(test_subreq);
@@ -175,13 +166,11 @@ static void test_request_done(void **state)
 /* calls fail() if test_rcv is not 0 */
 static void test_request_recv(void **state)
 {
-	/* incomplete */
 	struct tevent_req *test_req;
 	TALLOC_CTX *mem_ctx;
 	uint8_t **test_reply = UINT8_MAX;
 	size_t *test_reply_len = SIZE_MAX;
 
-	/* pending */
 	int test_rcv = dns_udp_request_recv(test_req, mem_ctx, test_reply, test_reply_len);
 	
 	assert_int_equal(test_rcv, 0);
@@ -227,8 +216,6 @@ static struct dns_client_tkey *test_tkey_name(void) {
 /* calls fail() if assertions are false */
 static void tkey_test(void **state)
 {
-	/* pending */
-	int err;
 	struct dns_client_tkey_store *test_store;
 	const char *test_name = "TEST_TKEY";
 	
@@ -250,14 +237,8 @@ static void tkey_test(void **state)
 /* calls fail() if test_werr not in werr_set */
 static void gen_tsig_test(void **state)
 {
-	/* incomplete declarations */
 	TALLOC_CTX *mem_ctx;
 	DATA_BLOB *in_test = {NULL, SIZE_MAX};
-	unsigned long werr_set[4];
-	werr_set[0] = 0x0;
-	werr_set[1] = 0x8;
-	werr_set[2] = 0x2329;
-	werr_set[3] = 0x2331;
 	
 	struct dns_client *test_client;
 	test_client->samdb = NULL;
@@ -286,10 +267,15 @@ static void gen_tsig_test(void **state)
 	test_packet->arcount = UINT16_MAX;
 
 	/* test error codes */
-	WERROR test_werr = (unsigned long) dns_cli_generate_tsig(test_client, mem_ctx,
+	WERROR test_werr = dns_cli_generate_tsig(test_client, mem_ctx,
 								test_state, test_packet, in_test);
 
-	assert_in_set(test_werr, werr_set, 4);
+	/* expected WERROR output */
+	assert_true(W_ERROR_IS_OK(test_werr));
+	assert_true(W_ERROR_EQUAL(WERR_NOT_ENOUGH_MEMORY, test_werr));
+	assert_true(W_ERROR_EQUAL(DNS_ERR(FORMAT_ERROR), test_werr));
+	assert_true(W_ERROR_EQUAL(DNS_ERR(NOTAUTH), test_werr));
+
 	TALLOC_FREE(mem_ctx);
 	return;
 }

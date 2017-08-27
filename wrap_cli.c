@@ -1,7 +1,5 @@
 /* DNS UDP/TCP send/recv wrapping with TSIG generation.
  *
- * --WORK IN PROGRESS--
- *
  * Copyright (C) 2017 Dimitrios Gravanis
  * 
  * Based on the existing work on Samba Unix SMB/CIFS implementation by
@@ -28,7 +26,7 @@
  */
 
 /* udp */
-tevent_req *__wrap_udp_req_send(TALLOC_CTX *mem_ctx, struct tevent_context *ev,
+struct tevent_req *__wrap_udp_req_send(TALLOC_CTX *mem_ctx, struct tevent_context *ev,
 			const char *server_addr_string, const uint8_t *query, size_t query_len)
 {
 	return dns_udp_request_send(TALLOC_CTX *mem_ctx,
@@ -50,7 +48,7 @@ int __wrap_udp_req_recv(struct tevent_req *subreq, struct tevent_req *req,
 }
 
 /* tcp */
-tevent_req *__wrap_tcp_req_send(TALLOC_CTX *mem_ctx, struct tevent_context *ev,
+struct tevent_req *__wrap_tcp_req_send(TALLOC_CTX *mem_ctx, struct tevent_context *ev,
 			const char *server_addr_string, struct iovec *vector, size_t count)
 {
 	return dns_tcp_req_send(TALLOC_CTX *mem_ctx,

@@ -1,7 +1,5 @@
 /* Tests TCP client-side DNS call handling.
  * 
- * --WORK IN PROGRESS--
- *
  * Copyright 2017 (c) Dimitrios Gravanis
  *
  * Uses cmocka C testing API.
@@ -33,14 +31,12 @@
 #include <cmocka.h>
 #include "libcli/dns/cli-fn/dns_tcp.c"
 
-/* --- INCOMPLETE ---*/
 
 /** test tcp send/recv functionality **/
 
 /* calls fail() if TCP test_req is NULL */
 static void test_req_send(void **state)
 {
-	/* incomplete */
 	TALLOC_CTX *mem_ctx;
 	struct tevent_context *test_ev;
 	const char *test_server_addr_string = "TEST_SRVR_ADDR";
@@ -58,7 +54,6 @@ static void test_req_send(void **state)
 /* calls fail() if test_subreq is NULL */
 static void test_req_recv_reply(void **state)
 {
-	/* pending */
 	struct tevent_req *test_subreq;
 	assert_non_null(test_subreq);
 	dns_tcp_req_recv_reply(test_subreq);
@@ -68,7 +63,6 @@ static void test_req_recv_reply(void **state)
 /* calls fail() if test_subreq is NULL */
 static void test_req_done(void **state)
 {
-	/* pending */
 	struct tevent_req *test_subreq;
 	assert_non_null(test_subreq);
 	dns_tcp_req_done(test_subreq);
@@ -78,13 +72,11 @@ static void test_req_done(void **state)
 /* calls fail() if test_rcv is not 0 */
 static void test_req_recv(void **state)
 {
-	/* incomplete */
 	TALLOC_CTX *mem_ctx;
 	struct tevent_req *test_req;
 	uint8_t **test_reply = UINT8_MAX;
 	size_t *test_reply_len = SIZE_MAX;
 
-	/* pending */
 	int test_rcv = dns_tcp_req_recv(test_req, mem_ctx, test_reply, test_reply_len);
 	
 	assert_int_equal(test_rcv, 0);
