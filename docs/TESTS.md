@@ -1,9 +1,9 @@
 ## README: test suites
 
 
-*Test suite cli_tests.c is functional and currently incorporated in Samba/wscript/*
+*Test suite cli_tests.c is building with Samba and currently incorporated in Samba/wscript/*
 
-*Individual test suites are functional, but stand alone waf built is not yet supported.*
+*Individual test suites are included, but stand alone waf built is not yet supported.*
 
 Tests for the client features are divided in four different test suites:
 
@@ -47,4 +47,4 @@ $ waf clean
 
 $ waf distclean
 ```
-
+*wscript for individual tests is not currently functional*
